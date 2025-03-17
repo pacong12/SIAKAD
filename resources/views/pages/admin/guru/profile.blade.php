@@ -29,6 +29,7 @@
                     <tr>
                         <th>Foto</th>
                         <td>
+    
                             <img src="{{Storage::url(auth()->user()->guru->image)}}" alt="" style="width: 250px" class="img-thumbnail">
                         </td>
                     </tr>
