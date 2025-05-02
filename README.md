@@ -3,12 +3,12 @@
 ## 1. Clone Repository
 Jalankan perintah berikut untuk meng-clone repository dari GitHub:
 ```bash
-git clone https://github.com/username/repository.git
+git clone https://github.com/pacong12/SIAKAD.git
 ```
 
 Setelah cloning selesai, masuk ke direktori proyek:
 ```bash
-cd repository
+cd SIAKAD
 ```
 
 ## 2. Install Dependencies
@@ -16,10 +16,7 @@ Jalankan perintah berikut untuk menginstal semua dependency Laravel:
 ```bash
 composer install
 ```
-Jika menggunakan **npm** untuk frontend assets, jalankan:
-```bash
-npm install && npm run dev
-```
+
 
 ## 3. Konfigurasi File `.env`
 Buat file `.env` dengan menyalin dari `.env.example`:
