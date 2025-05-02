@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\SyncUserImages::class,
     ];
 
     /**
@@ -25,6 +25,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        
+        // Sinkronisasi image user setiap hari pada jam 1 pagi
+        $schedule->command('users:sync-images')->dailyAt('01:00');
     }
 
     /**

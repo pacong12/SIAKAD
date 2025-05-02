@@ -13,7 +13,7 @@
         
         <!-- Filter dan Tombol Cetak -->
         <div class="row mb-4">
-          <div class="col-md-8">
+          <div class="col-md-12">
             <div class="card shadow">
               <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Filter & Cetak Jadwal</h6>
@@ -21,7 +21,7 @@
               <div class="card-body">
                 <form id="filter-form" class="form-inline">
                   <div class="form-group mr-3">
-                    <label for="kelas_filter" class="mr-2">Kelas:</label>
+                    <label for="kelas_filter" class="mr-3">Kelas:</label>
                     <select class="form-control" id="kelas_filter">
                       <option value="">Semua Kelas</option>
                       @foreach($items->groupBy('kelas_id') as $kelasId => $jadwalKelas)

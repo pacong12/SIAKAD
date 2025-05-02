@@ -36,12 +36,10 @@
     <!-- Nav Item - User Information -->
     <li class="nav-item dropdown no-arrow">
       <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{auth()->user()->name}}</span>
-        @if(auth()->user()->image)
-          <img class="img-profile rounded-circle" src="{{Storage::url(auth()->user()->image)}}">
-        @else
-          <img class="img-profile rounded-circle" src="{{url('../../foto/profile.png')}}">
-        @endif
+        <span class="mr-2 d-none d-lg-inline text-gray-600 small font-weight-bold">{{auth()->user()->name}}</span>
+        <div class="profile-img-wrapper">
+          <img class="img-profile rounded-circle border border-primary" src="{{ asset('foto/profile.png') }}" width="40" height="40">
+        </div>
       </a>
       <!-- Dropdown - User Information -->
       <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -63,3 +61,21 @@
 
 </nav>
 <!-- End of Topbar -->
+
+<style>
+.profile-img-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.img-profile {
+  object-fit: cover;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.img-profile:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+</style>

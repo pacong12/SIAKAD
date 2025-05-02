@@ -27,5 +27,8 @@ class DatabaseSeeder extends Seeder
         // Financial data
         $this->call(JenispemSeeder::class);
         $this->call(PembayaranSeeder::class);
+        
+        // Data synchronization
+        $this->call(UserImageUpdateSeeder::class);
     }
 }
