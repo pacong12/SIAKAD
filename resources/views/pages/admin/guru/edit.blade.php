@@ -14,7 +14,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <form action="/guru/{{$item->id}}/update" method="POST" enctype="multipart/form-data">
+            <form action="/admin/guru/{{$item->id}}/update" method="POST" enctype="multipart/form-data">
               @method('PUT')
               @csrf
               <div class="form-group">
@@ -122,7 +122,7 @@
                 <p class="text-danger">Masukan Foto Bila Perlu</p>
               </div>
               <button type="submit" class="btn btn-success btn-sm">Simpan</button>
-              <a href="/guru" class="btn btn-secondary btn-sm">Kembali</a>
+              <a href="/admin/guru" class="btn btn-secondary btn-sm">Kembali</a>
             </form>
           </div>
         </div>

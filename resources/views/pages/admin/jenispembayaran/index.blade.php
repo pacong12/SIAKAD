@@ -21,6 +21,8 @@
                   <tr>
                     <th>No</th>
                     <th>Jenis Pembayaran</th>
+                    <th>Nominal</th>
+                    <th>Periode</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
@@ -29,6 +31,8 @@
                     <tr>
                       <td>{{$loop->iteration}}</td>
                       <td>{{$item->jenis}}</td>
+                      <td>Rp {{number_format($item->nominal, 0, ',', '.')}}</td>
+                      <td>{{date('d M Y', strtotime($item->tanggal_mulai))}} - {{date('d M Y', strtotime($item->tanggal_selesai))}}</td>
                       <td>
                           <a href="{{route('jenispem.edit', $item->id)}}" class="btn btn-circle btn-sm btn-warning">
                               <i class="fa fa-edit"></i>

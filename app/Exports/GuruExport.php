@@ -14,7 +14,7 @@ class GuruExport implements FromCollection, WithMapping, WithHeadings
     */
     public function collection()
     {
-        return Guru::all();
+        return Guru::orderBy('nama')->get();
     }
 
     public function map($guru): array

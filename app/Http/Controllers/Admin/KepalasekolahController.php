@@ -12,14 +12,14 @@ class KepalasekolahController extends Controller
 {
     public function siswa()
     {
-        $items = Siswa::all();
+        $items = Siswa::with('kelasAktif')->get();
 
         return view('pages.admin.kepalasekolah.siswa', compact('items'));
     }
 
     public function detailsiswa($id)
     {
-        $item = Siswa::findOrFail($id);
+        $item = Siswa::with('kelasAktif')->findOrFail($id);
 
         return view('pages.admin.kepalasekolah.detailsiswa', [
             'item' => $item

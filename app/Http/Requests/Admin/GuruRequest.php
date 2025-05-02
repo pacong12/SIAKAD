@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class GuruRequest extends FormRequest
 {
@@ -23,16 +24,27 @@ class GuruRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'nip' => 'required|unique:gurus,nip',
+        $rules = [
             'nama' => 'required|string|min:3',
             'tpt_lahir' => 'required|min:3',
             'tgl_lahir' => 'required',
             'jns_kelamin' => 'required',
             'agama' => 'required',
             'alamat' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,giv,svg'
         ];
+
+        // Jika request untuk membuat data baru (POST)
+        if ($this->isMethod('post')) {
+            $rules['nip'] = 'required|unique:gurus,nip';
+            $rules['image'] = 'required|image|mimes:jpeg,png,jpg,gif,svg';
+        } 
+        // Jika request untuk update data (PUT/PATCH)
+        else if ($this->isMethod('put') || $this->isMethod('patch')) {
+            $rules['nip'] = 'required|unique:gurus,nip,' . $this->route('guru');
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg';
+        }
+
+        return $rules;
     }
 
     public function messages()
@@ -50,7 +62,7 @@ class GuruRequest extends FormRequest
             'alamat.min' => 'Alamat minimal 3 karakter',
             'image.image' => 'File harus gambar',
             'image.required' => 'Foto harus dimasukan',
-            'image.mimes' => 'File harus berformat jpeg,jpg,giv,svg,png'
+            'image.mimes' => 'File harus berformat jpeg,jpg,gif,svg,png'
         ];
     }
 }

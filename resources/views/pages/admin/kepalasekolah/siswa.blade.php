@@ -5,7 +5,7 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <h1 class="h3 mt-3 text-gray-800 mb-4">Data Siswa SD Negeri Limbangan 06</h1>
+        <h1 class="h3 mt-3 text-gray-800 mb-4">Data Siswa {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</h1>
 
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
@@ -27,7 +27,13 @@
                         <td>{{$loop->iteration}}</td>
                         <td>{{$item->nisn}}</td>
                         <td>{{$item->nama}}</td>
-                        <td>{{$item->kelas}}</td>
+                        <td>
+                          @if($item->kelasAktif->isNotEmpty())
+                            {{ $item->kelasAktif->first()->nama_kelas }}
+                          @else
+                            -
+                          @endif
+                        </td>
                         <td>
                           <a href="/kepalasekolah/{{$item->id}}/siswa" class="btn btn-circle btn-success btn-sm">
                               Detail

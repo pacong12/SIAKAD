@@ -36,8 +36,8 @@
                 <div class="form-group">
                   <label for="status">Status</label>
                   <select class="form-control" name="status" required>
-                    <option value="Aktif" @if($item->status == 'Aktif') selected @endif>Aktif</option>
-                    <option value="Tidak Aktif" @if($item->status == 'Tidak Aktif') selected @endif>Tidak Aktif</option>
+                    <option value="aktif" @if($item->status == 'aktif') selected @endif>Aktif</option>
+                    <option value="tidak aktif" @if($item->status == 'tidak aktif') selected @endif>Tidak Aktif</option>
                   </select>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm">Simpan</button>

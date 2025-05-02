@@ -9,10 +9,36 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
     <title>Data Pembayaran</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .badge-success {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 3px;
+      }
+      .badge-danger {
+        background-color: #dc3545;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 3px;
+      }
+    </style>
   </head>
   <body>
-    {{-- <img src="{{url('foto/bunayya.png')}}" alt=""> --}}
-    <h3 class="text-center mb-3">Laporan Data Pembayaran</h3>
+    {{-- <img src="{{url('foto/tutwuri.png')}}" alt=""> --}}
+    <div class="header">
+      <h3>{{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</h3>
+      <h4>Laporan Data Pembayaran Per Tanggal</h4>
+      <p>Periode: {{ isset($tglawal) && isset($tglakhir) ? date('d/m/Y', strtotime($tglawal)) . ' - ' . date('d/m/Y', strtotime($tglakhir)) : date('d/m/Y') }}</p>
+    </div>
     <table class="table table-striped table-bordered text-center table-sm">
         <thead>
             <tr>
@@ -23,6 +49,7 @@
                 <th>Kelas</th>
                 <th>Tanggal</th>
                 <th>Jumlah</th>
+                <th>Status</th>
                 <th>Keterangan</th>
             </tr>
         </thead>
@@ -42,17 +69,30 @@
                     <td>{{$p->kelas}}</td>
                     <td>{{$p->tanggal}}</td>
                     <td>Rp. {{number_format($p->jum_pemb)}}</td>
+                    <td>
+                        <span class="badge-{{ $p->status == 'lunas' ? 'success' : 'danger' }}">
+                            {{ $p->status == 'lunas' ? 'Sudah Lunas' : 'Belum Lunas' }}
+                        </span>
+                    </td>
                     <td>{{$p->keterangan}}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="9" class="text-center">
                         Data Kosong
                     </td>
                 </tr>
             @endforelse
         </tbody>
-    </table>   
+    </table>
+
+    <div style="margin-top: 30px; text-align: right;">
+        <p>{{ \App\Sekolah::first()->alamat ? explode(',', \App\Sekolah::first()->alamat)[0] : 'Tempat' }}, {{ date('d F Y') }}</p>
+        <p>Kepala Sekolah</p>
+        <br><br><br>
+        <p>{{ \App\Sekolah::first()->kepala_sklh ?? '___________________' }}</p>
+    </div>
+    
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

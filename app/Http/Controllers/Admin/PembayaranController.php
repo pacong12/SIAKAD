@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Exports\PembayaranExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use App\Siswa;
 
 class PembayaranController extends Controller
 {
@@ -19,11 +20,30 @@ class PembayaranController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $jenispems = Jenispem::all();
-        $items = Pembayaran::orderBy('id', 'DESC')->get();
-        return view('pages.admin.pembayaran.index', compact('jenispems', 'items'));
+        $siswas = Siswa::all();
+        $query = Pembayaran::with('jenispem')->orderBy('id', 'DESC');
+
+        // Filter Kelas
+        if ($request->has('kelas') && $request->kelas != '') {
+            $query->where('kelas', $request->kelas);
+        }
+
+        // Filter Status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter Jenis Pembayaran
+        if ($request->has('jenispem_id') && $request->jenispem_id != '') {
+            $query->where('jenispem_id', $request->jenispem_id);
+        }
+
+        $items = $query->get();
+
+        return view('pages.admin.pembayaran.index', compact('jenispems', 'items', 'siswas'));
     }
 
     /**
@@ -33,7 +53,9 @@ class PembayaranController extends Controller
      */
     public function create()
     {
-        
+        $siswas = Siswa::all();
+        $jenispems = Jenispem::all();
+        return view('pages.admin.pembayaran.create', compact('siswas', 'jenispems'));
     }
 
     /**
@@ -45,21 +67,31 @@ class PembayaranController extends Controller
     public function store(PembayaranRequest $request)
     {
         $tanggal = Carbon::now();
+        
+        // Ambil data siswa berdasarkan NISN
+        $siswa = Siswa::where('nisn', $request->nisn)->first();
+        
+        // Ambil data jenis pembayaran untuk mendapatkan nominal
+        $jenispem = Jenispem::find($request->jenispem_id);
 
         $pemb = new Pembayaran;
         $pemb->nisn = $request->nisn;
-        $pemb->nama = $request->nama;
+        $pemb->nama = $siswa->nama; // Ambil nama dari data siswa
         $pemb->jenispem_id = $request->jenispem_id;
         $pemb->tanggal = $tanggal;
         $pemb->kelas = $request->kelas;
-        $pemb->jum_pemb = $request->jum_pemb;
+        $pemb->jum_pemb = $jenispem->nominal; // Gunakan nominal dari jenis pembayaran
         $pemb->keterangan = $request->keterangan;
+        $pemb->status = 'belum lunas';
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            $file = $request->file('bukti_pembayaran');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/bukti_pembayaran', $filename);
+            $pemb->bukti_pembayaran = $filename;
+        }
 
         $pemb->save();
-        // $data = $request->all();
-        // // dd($data);
-
-        // Pembayaran::create($data);
 
         return redirect()->route('pembayaran.index')->with('status', 'Data berhasil Ditambah');
     }
@@ -144,8 +176,8 @@ class PembayaranController extends Controller
     public function cetakPDF()
     {
         $pembayaran = Pembayaran::all();
-
-        $pdf = PDF::loadview('export.pembayaranpdf', compact('pembayaran'));
+        $sekolah = \App\Sekolah::first();
+        $pdf = PDF::loadview('export.pembayaranpdf', compact('pembayaran', 'sekolah'));
         return $pdf->download('laporan-pembayaran.pdf');
     }
 
@@ -159,12 +191,101 @@ class PembayaranController extends Controller
         return view('pages.admin.pembayaran.cetakPembayaran');
     }
 
-    public function cetakPembayaranPertanggal($tglawal, $tglakhir)
+    public function cetakPembayaranPertanggal($tglawal, $tglakhir, Request $request)
     {
-        // dd(["Tanggal Awal : ".$tglawal, "Tanggal Akhir : ".$tglakhir]);
-        $pembayaranPertanggal = Pembayaran::all()->whereBetween('tanggal', [$tglawal, $tglakhir]);
+        $query = Pembayaran::with('jenispem')->whereBetween('tanggal', [$tglawal, $tglakhir]);
+        
+        // Filter berdasarkan kelas jika ada
+        if ($request->has('kelas') && $request->kelas != '') {
+            $query->where('kelas', $request->kelas);
+        }
+        
+        // Filter berdasarkan status jika ada
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+        
+        $pembayaranPertanggal = $query->get();
+        
+        // Jika request meminta download PDF
+        if ($request->has('download') && $request->download == 'pdf') {
+            $sekolah = \App\Sekolah::first();
+            $pdf = PDF::loadview('export.pembayaranpertanggalpdf', compact('pembayaranPertanggal', 'tglawal', 'tglakhir', 'sekolah'));
+            return $pdf->download('laporan-pembayaran-' . $tglawal . '-' . $tglakhir . '.pdf');
+        }
+        
+        return view('pages.admin.pembayaran.cetakPembayaranPertanggal', compact('pembayaranPertanggal'));
+    }
 
-        $pdf = PDF::loadview('export.pembayaranpertanggalpdf', compact('pembayaranPertanggal'));
-        return $pdf->download('laporan-pembayaran.pdf');
+    public function cetakDetail($id)
+    {
+        $item = Pembayaran::findOrFail($id);
+        $sekolah = \App\Sekolah::first();
+        $pdf = PDF::loadview('export.pembayarandetailpdf', compact('item', 'sekolah'));
+        return $pdf->download('detail-pembayaran-'.$item->nisn.'.pdf');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $pemb = Pembayaran::findOrFail($id);
+        $pemb->status = $request->status;
+        $pemb->save();
+
+        return redirect()->route('pembayaran.index')->with('status', 'Status pembayaran berhasil diubah');
+    }
+
+    public function createBulkPayment(Request $request)
+    {
+        $tanggal = Carbon::now();
+        $jenispem = Jenispem::find($request->jenispem_id);
+        
+        if (!$jenispem) {
+            return redirect()->back()->with('error', 'Jenis pembayaran tidak ditemukan');
+        }
+
+        // Ambil siswa berdasarkan tipe pembayaran
+        if ($request->has('tipe_pembayaran') && $request->tipe_pembayaran == 'perkelas') {
+            if (!$request->has('kelas_pembayaran') || empty($request->kelas_pembayaran)) {
+                return redirect()->back()->with('error', 'Silakan pilih kelas terlebih dahulu');
+            }
+            
+            // Menggunakan relasi kelas dan siswa dari tabel siswa_kelas
+            $siswas = Siswa::whereHas('kelasAktif', function($query) use ($request) {
+                $query->where('kelas.tingkat', $request->kelas_pembayaran);
+            })->get();
+            
+            $pesanStatus = 'Pembayaran berhasil dibuat untuk siswa kelas ' . $request->kelas_pembayaran;
+        } else {
+            // Ambil semua siswa untuk seluruh kelas
+            $siswas = Siswa::all();
+            $pesanStatus = 'Pembayaran berhasil dibuat untuk semua siswa';
+        }
+        
+        foreach ($siswas as $siswa) {
+            // Mendapatkan kelas siswa saat ini
+            $kelasSiswa = $siswa->kelasAktif->first();
+            $kelasNomor = $kelasSiswa ? $kelasSiswa->tingkat : null;
+            
+            // Cek apakah siswa sudah memiliki pembayaran ini
+            $existingPayment = Pembayaran::where('nisn', $siswa->nisn)
+                ->where('jenispem_id', $jenispem->id)
+                ->whereYear('tanggal', $tanggal->year)
+                ->first();
+
+            if (!$existingPayment) {
+                $pemb = new Pembayaran;
+                $pemb->nisn = $siswa->nisn;
+                $pemb->nama = $siswa->nama;
+                $pemb->jenispem_id = $jenispem->id;
+                $pemb->tanggal = $tanggal;
+                $pemb->kelas = $kelasNomor;
+                $pemb->jum_pemb = $jenispem->nominal;
+                $pemb->keterangan = $request->keterangan;
+                $pemb->status = 'belum lunas';
+                $pemb->save();
+            }
+        }
+
+        return redirect()->route('pembayaran.index')->with('status', $pesanStatus);
     }
 }

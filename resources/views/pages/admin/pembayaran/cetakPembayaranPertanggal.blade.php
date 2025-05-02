@@ -12,46 +12,112 @@
         <h1 class="h3 mb-2 text-gray-800">Laporan Pembayaran</h1>
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+              Laporan Pembayaran Periode: {{ date('d M Y', strtotime(request('tglawal'))) }} - {{ date('d M Y', strtotime(request('tglakhir'))) }}
+            </h6>
+          </div>
           <div class="card-body">
-            {{-- <a href="{{route('pembayaran.cetakexcel')}}" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
-            <a href="{{route('pembayaran.cetakpdf')}}" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a> --}}
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <form action="{{ route('pembayaran.cetaktgl', [request('tglawal'), request('tglakhir')]) }}" method="GET" class="mb-3">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="kelas">Filter Kelas</label>
+                        <select class="form-control" name="kelas" id="kelas">
+                          <option value="">Semua Kelas</option>
+                          <option value="1" {{ request('kelas') == '1' ? 'selected' : '' }}>Kelas 1</option>
+                          <option value="2" {{ request('kelas') == '2' ? 'selected' : '' }}>Kelas 2</option>
+                          <option value="3" {{ request('kelas') == '3' ? 'selected' : '' }}>Kelas 3</option>
+                          <option value="4" {{ request('kelas') == '4' ? 'selected' : '' }}>Kelas 4</option>
+                          <option value="5" {{ request('kelas') == '5' ? 'selected' : '' }}>Kelas 5</option>
+                          <option value="6" {{ request('kelas') == '6' ? 'selected' : '' }}>Kelas 6</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="status">Status Pembayaran</label>
+                        <select class="form-control" name="status" id="status">
+                          <option value="">Semua Status</option>
+                          <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>Sudah Lunas</option>
+                          <option value="belum lunas" {{ request('status') == 'belum lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter mr-1"></i> Filter
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <a href="{{ route('pembayaran.cetak') }}" class="btn btn-secondary mr-2">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali
+              </a>
+              <a href="{{ request('kelas') || request('status') ? 
+                route('pembayaran.cetakpdf', ['tglawal' => request('tglawal'), 'tglakhir' => request('tglakhir'), 'kelas' => request('kelas'), 'status' => request('status')]) : 
+                route('pembayaran.cetakpdf', ['tglawal' => request('tglawal'), 'tglakhir' => request('tglakhir')]) }}" 
+                class="btn btn-danger">
+                <i class="fas fa-file-pdf mr-1"></i> Cetak PDF
+              </a>
+            </div>
+            
             <div class="table-responsive">
               <table class="table table-striped table-sm table-bordered text-center" id="tablePembayaran" width="100%" cellspacing="0">
                 <thead>
                   <tr>
                     <th>No</th>
+                    <th>NISN</th>
                     <th>Nama</th>
-                    <th>Pembayaran</th>
-                    <th>Jumlah Bayar</th>
+                    <th>Kelas</th>
+                    <th>Jenis Pembayaran</th>
+                    <th>Nominal</th>
                     <th>Tanggal</th>
+                    <th>Status</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @foreach ($pembayaranPertanggal as $item)
+                  @forelse ($pembayaranPertanggal as $item)
                     <tr>
                         <td>{{$loop->iteration}}</td>
+                        <td>{{$item->nisn}}</td>
                         <td>{{$item->nama}}</td>
-                        <td>{{$item->jenispem->jenis}}</td>
-                        <td>Rp. {{$item->jum_pemb}}</td>
-                        <td>{{$item->tanggal}}</td>
+                        <td>{{$item->kelas}}</td>
+                        <td>
+                          @if ($item->jenispem == null)
+                              Jenis Pembayaran Terhapus
+                          @else
+                              {{$item->jenispem->jenis}}
+                          @endif
+                        </td>
+                        <td>Rp. {{number_format($item->jum_pemb)}}</td>
+                        <td>{{date('d M Y', strtotime($item->tanggal))}}</td>
+                        <td>
+                          <span class="badge badge-{{$item->status == 'lunas' ? 'success' : 'danger'}}">
+                            {{$item->status == 'lunas' ? 'Sudah Lunas' : 'Belum Lunas'}}
+                          </span>
+                        </td>
                         <td>
                             <a href="{{route('pembayaran.show', $item->id)}}" class="btn btn-circle btn-sm btn-info">
                                 <i class="fa fa-eye"></i>
                             </a>
-                            <a href="{{route('pembayaran.edit', $item->id)}}" class="btn btn-circle btn-sm btn-warning">
-                                <i class="fa fa-edit"></i>
+                            <a href="{{route('pembayaran.cetakdetail', $item->id)}}" class="btn btn-circle btn-sm btn-primary">
+                                <i class="fas fa-file-pdf"></i>
                             </a>
-                            <form action="{{route('pembayaran.destroy', $item->id)}}" method="POST" class="d-inline">
-                              @csrf
-                              @method('delete')
-                              <button class="btn btn-circle btn-sm btn-danger">
-                                  <i class="fa fa-trash"></i>
-                              </button>
-                          </form>
                         </td>
                     </tr>
-                  @endforeach
+                  @empty
+                    <tr>
+                      <td colspan="9" class="text-center">Tidak ada data pembayaran pada periode ini</td>
+                    </tr>
+                  @endforelse
                 </tbody>
               </table>
             </div>

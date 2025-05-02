@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Profile | SD Negeri Limbangan 06    
+    Profile | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}    
 @endsection
 
 @section('content')

@@ -14,7 +14,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <form action="/siswa/store" method="POST" enctype="multipart/form-data">
+            <form action="/admin/siswa/store" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                   <label for="nisn">Nisn</label>
@@ -130,19 +130,16 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="kelas">Kelas</label>
+                  <label for="kelas_id">Kelas</label>
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <label class="input-group-text" for="kelas"><i class="fas fa-user-graduate"></i></label>
+                      <label class="input-group-text" for="kelas_id"><i class="fas fa-user-graduate"></i></label>
                     </div>
-                    <select class="custom-select" name="kelas">
-                      <option>-- Pilih --</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                      <option value="6">6</option>
+                    <select class="custom-select" name="kelas_id">
+                      <option value="">-- Pilih Kelas --</option>
+                      @foreach($kelas as $k)
+                        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                      @endforeach
                     </select>
                   </div>
                 </div>
@@ -171,7 +168,7 @@
                 </div>
                 <button type="submit" class="btn btn-success btn-sm">Simpan</button>
                 <button type="reset" class="btn btn-warning btn-sm">Reset</button>
-                <a href="/siswa" class="btn btn-secondary btn-sm">Kembali</a>
+                <a href="/admin/siswa" class="btn btn-secondary btn-sm">Kembali</a>
             </form>
           </div>
         </div>

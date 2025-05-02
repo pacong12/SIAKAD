@@ -11,8 +11,8 @@
         <!-- Page Heading -->
         <h1 class="h3 text-gray-800">Data Siswa</h1>
         
-        <a href="/siswa/exportexcel" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
-        <a href="/siswa/exportpdf" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a>
+        <a href="/admin/siswa/exportexcel" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
+        <a href="/admin/siswa/exportpdf" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a>
         {{-- <button type="button" class="btn btn-primary btn-sm mb-3 px-3 py-2" data-toggle="modal" data-target="#exampleModal">
           Import Data
         </button> --}}
@@ -20,7 +20,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <a href="/siswa/create" class="btn btn-primary btn-sm mb-3 px-3 py-2">
+            <a href="/admin/siswa/create" class="btn btn-primary btn-sm mb-3 px-3 py-2">
               <i class="fas fa-plus mr-2"></i>
               Tambah Data Siswa
             </a>
@@ -41,12 +41,18 @@
                       <td>{{$loop->iteration}}</td>
                       <td>{{$item->nisn}}</td>
                       <td>{{$item->nama}}</td>
-                      <td>{{$item->kelas}}</td>
                       <td>
-                        <a href="/siswa/{{$item->id}}/show"" class="btn btn-circle btn-info btn-sm">
+                        @if($item->kelasAktif->isNotEmpty())
+                          {{ $item->kelasAktif->first()->nama_kelas }}
+                        @else
+                          -
+                        @endif
+                      </td>
+                      <td>
+                        <a href="/admin/siswa/{{$item->id}}/show" class="btn btn-circle btn-info btn-sm">
                             <i class="fa fa-eye"></i>
                         </a>
-                        <a href="/siswa/{{$item->id}}/edit"" class="btn btn-circle btn-warning btn-sm">
+                        <a href="/admin/siswa/{{$item->id}}/edit" class="btn btn-circle btn-warning btn-sm">
                             <i class="fa fa-edit"></i>
                         </a>
                         <a href="#" class="btn btn-sm btn-circle btn-danger delete" siswa-nama="{{$item->nama}}" siswa-id="{{$item->id}}">
@@ -117,7 +123,7 @@
           .then((willDelete) => {
               console.log(willDelete);
             if (willDelete) {
-              window.location = "siswa/"+$siswaid+"/destroy";
+              window.location = "/admin/siswa/"+$siswaid+"/destroy";
             } else {
               swal("Data "+$siswanama+" Tidak Terhapus");
             }

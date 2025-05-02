@@ -20,6 +20,17 @@ class AuthController extends Controller
     public function postlogin(Request $request)
     {
         if(Auth::attempt($request->only('username', 'password'))){
+            $user = Auth::user();
+            
+            if ($user->role === 'admin') {
+                return redirect('/admin');
+            } else if ($user->role === 'guru') {
+                return redirect('/guru');
+            } else if ($user->role === 'siswa') {
+                return redirect('/siswa/profile');
+            }
+            
+            // Default fallback jika tidak termasuk role di atas
             return redirect('/home');
         }
 

@@ -18,8 +18,8 @@
 <body>
     {{-- {{dd($sekolah)}} --}}
     <h4 class="text-center">Hasil Nilai Siswa</h4>
-    <h4 class="text-center">Tahun Akademik 2020/2021</h4>
-    <h4 class="text-center">SD Negeri Limbangan 06 SEMARANG</h4>
+    <h4>{{ strtoupper($sekolah->nama ?? 'SEKOLAH') }}</h4>
+    <h4>TAHUN PELAJARAN {{ $tahunAkademik ? $tahunAkademik->tahun_akademik : date('Y').'/'.((int)date('Y')+1) }} - SEMESTER {{ $tahunAkademik ? $tahunAkademik->semester : '' }}</h4>
     <hr>
     <h6 class="text-left">NISN    : {{auth()->user()->username}}</h6>
     <h6 class="text-left">NAMA     : {{auth()->user()->name}}</h6>
@@ -27,10 +27,9 @@
         <thead class="thead-dark">
             <tr>
                 <th>Mapel</th>
-                <th>Nilai uh1</th>
-                <th>Nilai uh2</th>
-                <th>Nilai uts</th>
-                <th>Nilai uas</th>
+                <th>Nilai UTS</th>
+                <th>Nilai UAS</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -38,14 +37,13 @@
             @forelse (auth()->user()->siswa->mapel as $mapel)
                 <tr>
                     <td>{{$mapel->nama_mapel}}</td>
-                    <td>{{$mapel->pivot->nilai_uh1}}</td>
-                    <td>{{$mapel->pivot->nilai_uh2}}</td>
                     <td>{{$mapel->pivot->uts}}</td>
                     <td>{{$mapel->pivot->uas}}</td>
+                    <td>{{$mapel->pivot->status}}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="4" class="text-center">
                         Data Kosong
                     </td>
                 </tr>

@@ -46,7 +46,13 @@
                     </tr>
                     <tr>
                         <th>Kelas</th>
-                        <td>{{$item->kelas}}</td>
+                        <td>
+                            @if($item->kelasAktif->isNotEmpty())
+                                {{ $item->kelasAktif->first()->nama_kelas }}
+                            @else
+                                -
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>Asal Sekolah</th>

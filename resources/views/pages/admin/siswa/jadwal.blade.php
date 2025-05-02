@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    SD Negeri Limbangan 06 - Jadwal
+{{ \App\Sekolah::first()->nama ?? 'Sekolah' }} - Jadwal
 @endsection
 
 @section('content')
@@ -25,7 +25,6 @@
                                 <th>Nama Mapel</th>
                                 <th>Nama Guru</th>
                                 <th>Kelas</th>
-                                <th>Ruang</th>
                                 <th>Hari</th>
                                 <th>Jam Mulai</th>
                                 <th>Jam Selesai</th>
@@ -33,7 +32,7 @@
                         </thead>
                         <tbody>
                             @foreach ($items as $item)
-                                @if (auth()->user()->siswa->kelas === $item->kelas)
+                                @if (auth()->user()->siswa->kelasAktif->contains('id', $item->kelas_id))
                                     <tr>
                                         <td>{{$item->mapel->nama_mapel}}</td>
                                         <td>
@@ -43,14 +42,7 @@
                                                 {{$item->guru->nama}}
                                             @endif
                                         </td>
-                                        <td>{{$item->kelas}}</td>
-                                        <td>
-                                            @if ($item->ruang == null)
-                                                Ruang Terhapus
-                                            @else
-                                                {{$item->ruang->nama_ruang}}
-                                            @endif
-                                        </td>
+                                        <td>{{$item->kelas->nama_kelas}}</td>
                                         <td>{{$item->hari}}</td>
                                         <td>{{$item->jam_mulai}}</td>
                                         <td>{{$item->jam_selesai}}</td>

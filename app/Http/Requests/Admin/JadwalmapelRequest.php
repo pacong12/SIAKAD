@@ -26,7 +26,6 @@ class JadwalmapelRequest extends FormRequest
         return [
             'mapel_id' => 'required|integer|exists:mapels,id',
             'guru_id' => 'required|integer|exists:gurus,id',
-            'ruang_id' => 'required|integer|exists:ruangs,id',
             'kelas' => 'required',
             'hari' => 'required',
             'jam_mulai' => 'required',

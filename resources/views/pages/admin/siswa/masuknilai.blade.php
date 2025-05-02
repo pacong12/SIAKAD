@@ -1,7 +1,7 @@
 @extends('layouts.admin.admin')
 
 @section('title')
-    Nilai
+    Nilai Siswa
 @endsection
 
 @section('content')
@@ -9,23 +9,53 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800 mt-4 mb-4">Pilih Kelas</h1>
+        <h1 class="h3 mb-4 text-gray-800">Input Nilai Siswa</h1>
         
-        
-        <!-- DataTales Example -->
+        <!-- Info Card -->
         <div class="card shadow mb-4">
-          <div class="card-body">
-            <label for="">Kelas</label>
-            <select class="form-control mb-3" id="kelas">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-            </select>
-            <a href="" onclick="this.href='/guru/nilaiProses/'+ document.getElementById('kelas').value" class="btn btn-primary"><i class="fas fa-spinner mr-2"></i>Proses Nilai</a>
-          </div>
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
+            </div>
+            <div class="card-body">
+                <p>Silahkan pilih kelas untuk melihat daftar siswa dan menginput nilai.</p>
+            </div>
+        </div>
+        
+        <!-- Class Selection Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Pilih Kelas</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @forelse ($kelas as $item)
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Kelas {{ $item->nama_kelas }}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            Tingkat {{ $item->tingkat }}
+                                            @if($item->guru)
+                                            <br>Wali Kelas: {{ $item->guru->nama }}
+                                            @endif
+                                        </small>
+                                    </p>
+                                    <a href="{{ url('/guru/nilaiProses/'.$item->id) }}" class="btn btn-primary">
+                                        <i class="fas fa-user-graduate mr-1"></i> Lihat Siswa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                Belum ada kelas yang tersedia. Silahkan hubungi administrator untuk menambahkan kelas.
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
     </div>
@@ -38,34 +68,6 @@
 
 @push('addon-script')
       <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-      <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-      <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-      <script>
-        $(document).ready(function() {
-          $('#dataTable').DataTable();
-        } );
-      </script>
-      <script>
-        $('.delete').click(function(){
-          var $gurunama = $(this).attr('guru-nama');
-          var $guruid = $(this).attr('guru-id');
-          swal({
-            title: "Apakah Kamu Yakin",
-            text: "Data Guru "+$gurunama+" Akan Terhapus",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-          })
-          .then((willDelete) => {
-              console.log(willDelete);
-            if (willDelete) {
-              window.location = "guru/"+$guruid+"/destroy";
-            } else {
-              swal("Data Guru "+$gurunama+" Tidak Terhapus");
-            }
-          });
-        })
-      </script>
       <script>
         @if (Session::has('status'))
           toastr.success("{{Session::get('status')}}", "Trimakasih")

@@ -11,8 +11,8 @@
     <title>Data Siswa</title>
   </head>
   <body>
-    {{-- <img src="{{url('foto/bunayya.png')}}" alt=""> --}}
-    <h3 class="text-center mb-3">Laporan Data Siswa Bunayya</h3>
+    {{-- <img src="{{url('foto/tutwuri.png')}}" alt=""> --}}
+    <h3 class="text-center mb-3">Laporan Data Siswa tutwuri</h3>
     <table class="table table-striped table-bordered text-center table-sm">
         <thead>
             <tr>
@@ -36,11 +36,17 @@
                     <td>{{$s->agama}}</td>
                     <td>{{$s->alamat}}</td>
                     <td>{{$s->nama_ortu}}</td>
-                    <td>{{$s->kelas}}</td>
+                    <td>
+                        @if($s->kelasAktif->isNotEmpty())
+                            {{ $s->kelasAktif->first()->nama_kelas }}
+                        @else
+                            -
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center">
+                    <td colspan="8" class="text-center">
                         Data Kosong
                     </td>
                 </tr>
@@ -94,12 +100,18 @@
                     <td>{{$s->agama}}</td>
                     <td>{{$s->alamat}}</td>
                     <td>{{$s->nama_ortu}}</td>
-                    <td>{{$s->kelas}}</td>
+                    <td>
+                        @if($s->kelasAktif->isNotEmpty())
+                            {{ $s->kelasAktif->first()->nama_kelas }}
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td>{{$s->asal_sklh}}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center">
+                    <td colspan="9" class="text-center">
                         Data Kosong
                     </td>
                 </tr>

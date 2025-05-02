@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Info Akademik | SD Negeri Limbangan 06  
+    Info Akademik | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}  
 @endsection
 
 @section('content')

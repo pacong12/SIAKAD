@@ -10,9 +10,12 @@ use App\Http\Requests\Admin\JadwalmapelRequest;
 use App\Jadwalmapel;
 use App\Mapel;
 use App\Guru;
-use App\Ruang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use App\Sekolah;
+use App\Thnakademik;
+use App\Exports\JadwalguruExport;
 
 class JadwalmapelController extends Controller
 {
@@ -24,7 +27,7 @@ class JadwalmapelController extends Controller
     public function index()
     {
         $items = Jadwalmapel::with([
-            'mapel'
+            'mapel', 'guru', 'kelas'
         ])->get();
         
         return view('pages.admin.jadwalmapel.index', [
@@ -41,11 +44,11 @@ class JadwalmapelController extends Controller
     {
         $gurus = Guru::all();
         $mapels = Mapel::all();
-        $ruangs = Ruang::all();
+        $kelas = \App\Kelas::all();
         return view('pages.admin.jadwalmapel.create', [
             'guru' => $gurus,
             'mapel' => $mapels,
-            'ruangs' => $ruangs
+            'kelas' => $kelas
         ]);
     }
 
@@ -61,7 +64,7 @@ class JadwalmapelController extends Controller
         // dd($data);
         Jadwalmapel::create($data);        
 
-        return redirect('/jadwalmapel')->with('status', 'Data Berhasil Dimasukan');
+        return redirect('/admin/jadwalmapel')->with('status', 'Data Berhasil Dimasukan');
     }
 
     /**
@@ -86,13 +89,13 @@ class JadwalmapelController extends Controller
         $item = Jadwalmapel::findOrFail($id);
         $gurus = Guru::all();
         $mapels = Mapel::all();
-        $ruangs = Ruang::all();
+        $kelas = \App\Kelas::all();
 
         return view('pages.admin.jadwalmapel.edit', [
             'item' => $item,
             'gurus' => $gurus,
             'mapels' => $mapels,
-            'ruangs' => $ruangs
+            'kelas' => $kelas
         ]);
     }
 
@@ -110,7 +113,7 @@ class JadwalmapelController extends Controller
         $item = Jadwalmapel::findOrFail($id);
         $item->update($data);
 
-        return redirect('/jadwalmapel')->with('status', 'Data Berhasil Diubah');
+        return redirect('/admin/jadwalmapel')->with('status', 'Data Berhasil Diubah');
     }
 
     /**
@@ -124,15 +127,14 @@ class JadwalmapelController extends Controller
         $item = Jadwalmapel::findOrFail($id);
         $item->delete();
 
-        return redirect('/jadwalmapel')->with('status', 'Data Berhasil Dihapus');
+        return redirect('/admin/jadwalmapel')->with('status', 'Data Berhasil Dihapus');
     } 
 
     public function jadwal()
     {
-        $items = Jadwalmapel::all();
-        // $items = Jadwalmapel::with([
-        //     'mapel', 'guru'
-        // ])->get();
+        $items = Jadwalmapel::with([
+            'mapel', 'guru', 'kelas'
+        ])->get();
         
         return view('pages.admin.guru.jadwal', [
             'items' => $items
@@ -144,10 +146,115 @@ class JadwalmapelController extends Controller
         return Excel::download(new JadwalmapelExport, 'Jadwalmapel.xlsx');
     }
 
+    public function exportExcelPerKelas($id)
+    {
+        $kelas = \App\Kelas::findOrFail($id);
+        return Excel::download(new JadwalmapelExport($id), 'Jadwalmapel-'.$kelas->nama_kelas.'.xlsx');
+    }
+
     public function exportPdf()
     {
-        $jadwal = Jadwalmapel::all();
-        $pdf = PDF::loadView('export.jadwalmapel', ['jadwal' => $jadwal]);
+        $jadwal = Jadwalmapel::with(['mapel', 'guru', 'kelas'])
+                ->orderBy('kelas_id')
+                ->orderBy(DB::raw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu')"))
+                ->orderBy('jam_mulai')
+                ->get();
+        
+        $tahunAkademik = Thnakademik::where('status', 'aktif')->first();
+        $sekolah = Sekolah::first();
+        
+        $pdf = PDF::loadView('export.jadwalmapel', [
+            'jadwal' => $jadwal,
+            'tahunAkademik' => $tahunAkademik,
+            'sekolah' => $sekolah
+        ]);
+        
+        // Set ukuran halaman dan orientasi landscape
+        $pdf->setPaper('a4', 'landscape');
+        
+        // Atur konfigurasi tambahan untuk DomPDF
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'defaultFont' => 'sans-serif',
+            'isRemoteEnabled' => true,
+            'dpi' => 150
+        ]);
+        
         return $pdf->download('Jadwalmapel.pdf');
+    }
+    
+    public function exportPdfPerKelas($id)
+    {
+        $kelas = \App\Kelas::findOrFail($id);
+        $jadwal = Jadwalmapel::with(['mapel', 'guru', 'kelas'])
+                ->where('kelas_id', $id)
+                ->orderBy(DB::raw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu')"))
+                ->orderBy('jam_mulai')
+                ->get();
+        
+        $tahunAkademik = Thnakademik::where('status', 'aktif')->first();
+        $sekolah = Sekolah::first();
+        
+        $pdf = PDF::loadView('export.jadwalmapel-perkelas', [
+            'jadwal' => $jadwal,
+            'kelas' => $kelas,
+            'tahunAkademik' => $tahunAkademik,
+            'sekolah' => $sekolah
+        ]);
+        
+        // Set ukuran halaman dan orientasi landscape
+        $pdf->setPaper('a4', 'landscape');
+        
+        // Atur konfigurasi tambahan untuk DomPDF
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'defaultFont' => 'sans-serif',
+            'isRemoteEnabled' => true,
+            'dpi' => 150
+        ]);
+        
+        return $pdf->download('Jadwalmapel-'.$kelas->nama_kelas.'.pdf');
+    }
+
+    public function exportExcelGuru($id) 
+    {
+        $guru = Guru::findOrFail($id);
+        return Excel::download(new JadwalguruExport($id), 'Jadwal-'.$guru->nama.'.xlsx');
+    }
+
+    public function exportPdfGuru($id)
+    {
+        $guru = Guru::findOrFail($id);
+        $jadwal = Jadwalmapel::with(['mapel', 'guru', 'kelas'])
+                ->where('guru_id', $id)
+                ->orderBy(DB::raw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu')"))
+                ->orderBy('jam_mulai')
+                ->get();
+        
+        $tahunAkademik = Thnakademik::where('status', 'aktif')->first();
+        $sekolah = Sekolah::first();
+        
+        $pdf = PDF::loadView('export.jadwalgurupdf', [
+            'jadwal' => $jadwal,
+            'guru' => $guru,
+            'tahunAkademik' => $tahunAkademik,
+            'sekolah' => $sekolah
+        ]);
+        
+        // Set ukuran halaman dan orientasi landscape
+        $pdf->setPaper('a4', 'landscape');
+        
+        // Atur konfigurasi tambahan untuk DomPDF
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'defaultFont' => 'sans-serif',
+            'isRemoteEnabled' => true,
+            'dpi' => 150
+        ]);
+        
+        return $pdf->download('Jadwal-'.$guru->nama.'.pdf');
     }
 }

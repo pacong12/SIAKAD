@@ -37,11 +37,10 @@
     <li class="nav-item dropdown no-arrow">
       <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{auth()->user()->name}}</span>
-        <img class="img-profile rounded-circle" src="
-        @if(auth()->user()->role == 'siswa' || 'guru')
-        {{Storage::url(auth()->user()->image)}}">
+        @if(auth()->user()->image)
+          <img class="img-profile rounded-circle" src="{{Storage::url(auth()->user()->image)}}">
         @else
-        <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+          <img class="img-profile rounded-circle" src="{{url('../../foto/profile.png')}}">
         @endif
       </a>
       <!-- Dropdown - User Information -->

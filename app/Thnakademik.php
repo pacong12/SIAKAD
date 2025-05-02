@@ -12,11 +12,6 @@ class Thnakademik extends Model
 
     protected $hidden = [];
 
-    public function tglkelas()
-    {
-        return $this->hasMany('App\Tinggalkelas');
-    }
-
     public function pg()
     {
         return $this->hasMany('App\Penilaianguru');
@@ -24,7 +19,7 @@ class Thnakademik extends Model
 
     public function mapel()
     {
-        return $this->belongsToMany(Mapel::class)->withPivot(['nilai_uh1', 'nilai_uh2', 'uts', 'uas', 'status']);
+        return $this->belongsToMany(Mapel::class, 'nilai_siswa')->withPivot(['uts', 'uas', 'status']);
     }
 
     public function siswa()

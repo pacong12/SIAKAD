@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Nilai | SD Negeri Limbangan 06
+    Nilai | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}
 @endsection
 
 @section('content')
@@ -22,8 +22,6 @@
                   <tr>
                     <th>Tahun Akademik</th>
                     <th>Mapel</th>
-                    <th>Nilai UH1</th>
-                    <th>Nilai UH2</th>
                     <th>Nilai UTS</th>
                     <th>Nilai UAS</th>
                     <th>Status</th>
@@ -38,8 +36,6 @@
                           @endforeach
                         </td>
                         <td>{{$mapel->nama_mapel}}</td>
-                        <td>{{$mapel->pivot->nilai_uh1}}</td>
-                        <td>{{$mapel->pivot->nilai_uh2}}</td>
                         <td>{{$mapel->pivot->uts}}</td>
                         <td>{{$mapel->pivot->uas}}</td>
                         <td>{{$mapel->pivot->status}}</td>

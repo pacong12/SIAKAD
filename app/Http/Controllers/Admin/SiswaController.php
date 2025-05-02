@@ -9,10 +9,9 @@ use App\Jadwalmapel;
 use App\User;
 use App\Mapel;
 use App\Sekolah;
-use App\Tugas;
 use App\Info;
 use App\Thnakademik;
-use App\Absensiswa;
+use App\Absensisiswa;
 // use Auth;
 use App\Exports\SiswaExport;
 use App\Imports\SiswaImport;
@@ -34,7 +33,7 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $items = Siswa::all();
+        $items = Siswa::with('kelasAktif')->get();
         
         return view('pages.admin.siswa.index', [
             'items' => $items
@@ -48,7 +47,8 @@ class SiswaController extends Controller
      */
     public function create()
     {
-        return view('pages.admin.siswa.create');
+        $kelas = \App\Kelas::all();
+        return view('pages.admin.siswa.create', compact('kelas'));
     }
 
     /**
@@ -78,9 +78,33 @@ class SiswaController extends Controller
             'assets/gallery', 'public'
         );
 
-        Siswa::create($data);
+        $siswa = Siswa::create($data);
         
-        return redirect('/siswa')->with('status', 'Data Berhasil Ditambahkan');
+        // Tambahkan siswa ke kelas yang dipilih
+        if ($request->kelas_id) {
+            // Dapatkan tahun akademik aktif
+            $thnAkademik = Thnakademik::where('status', 'Aktif')->first();
+            
+            if ($thnAkademik) {
+                $siswa->kelas()->attach($request->kelas_id, [
+                    'thnakademik_id' => $thnAkademik->id,
+                    'semester' => $thnAkademik->semester,
+                    'status_aktif' => true
+                ]);
+            } else {
+                // Jika tidak ada tahun akademik aktif, gunakan tahun pertama
+                $thnAkademik = Thnakademik::orderBy('id', 'asc')->first();
+                if ($thnAkademik) {
+                    $siswa->kelas()->attach($request->kelas_id, [
+                        'thnakademik_id' => $thnAkademik->id,
+                        'semester' => $thnAkademik->semester,
+                        'status_aktif' => true
+                    ]);
+                }
+            }
+        }
+        
+        return redirect('/admin/siswa')->with('status', 'Data Berhasil Ditambahkan');
     }
 
     
@@ -93,7 +117,7 @@ class SiswaController extends Controller
      */
     public function show($id)
     {
-        $item = Siswa::findOrFail($id);
+        $item = Siswa::with('kelasAktif')->findOrFail($id);
         $matapelajarans = Mapel::all();
 
         return view('pages.admin.siswa.detail', [
@@ -110,10 +134,12 @@ class SiswaController extends Controller
      */
     public function edit($id)
     {
-        $item = Siswa::findOrFail($id);
+        $item = Siswa::with('kelasAktif')->findOrFail($id);
+        $kelas = \App\Kelas::all();
 
         return view('pages.admin.siswa.edit', [
-            'item' => $item
+            'item' => $item,
+            'kelas' => $kelas
         ]);
     }
 
@@ -124,70 +150,57 @@ class SiswaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(SiswaRequest $request, $id)
     {
-        $data = Siswa::findOrFail($id);
-        $update_siswa = $data->user_id;
-        // dd($j);
+        $data = $request->all();
+        
+        $siswa = Siswa::findOrFail($id);
 
-        if(request('image')) {
-            Storage::delete($data->image);
-            $image = request()->file('image')->store('assets/gallery', 'public');
-        } elseif($data->image) {
-            $image = $data->image;
+        $user = User::findOrFail($siswa->user_id);
+        $user->role = 'siswa';
+        $user->name = $request->nama;
+        $user->save();
+        
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store(
+                'assets/gallery', 'public'
+            );
         } else {
-            $image = null;
+            // hapus item
+            unset($data['image']);
         }
 
-        $data->update([
-            'nisn' => $request->nisn,
-            'nama' => $request->nama,
-            'tpt_lahir' => $request->tpt_lahir,
-            'tgl_lahir' => $request->tgl_lahir,
-            'jns_kelamin' => $request->jns_kelamin,
-            'agama' => $request->agama,
-            'alamat' => $request->alamat,
-            'nama_ortu' => $request->nama_ortu,
-            'kelas' => $request->kelas,
-            'asal_sklh' => $request->asal_sklh,
-            'image' => $image
-        ]);
+        $siswa->update($data);
+        
+        // Update relasi kelas
+        if ($request->kelas_id) {
+            // Dapatkan tahun akademik aktif
+            $thnAkademik = Thnakademik::where('status', 'Aktif')->first();
+            
+            if ($thnAkademik) {
+                $siswa->kelas()->sync([
+                    $request->kelas_id => [
+                        'thnakademik_id' => $thnAkademik->id,
+                        'semester' => $thnAkademik->semester,
+                        'status_aktif' => true
+                    ]
+                ]);
+            } else {
+                // Jika tidak ada tahun akademik aktif, gunakan tahun pertama
+                $thnAkademik = Thnakademik::orderBy('id', 'asc')->first();
+                if ($thnAkademik) {
+                    $siswa->kelas()->sync([
+                        $request->kelas_id => [
+                            'thnakademik_id' => $thnAkademik->id,
+                            'semester' => $thnAkademik->semester,
+                            'status_aktif' => true
+                        ]
+                    ]);
+                }
+            }
+        }
 
-        $baru = User::find($update_siswa);
-        $baru->name = $request->nama;
-        $baru->image = $image;
-        $baru->username = $request->nisn;
-        $baru->password = bcrypt($request->nisn);
-        $baru->remember_token = Str::random(60);
-        $baru->save();
-
-        // $messages = [
-        //     'required' => 'Tidak boleh kosong',
-        //     'min' => 'Minimal 3 karakter'
-        // ];
-
-        // $this->validate($request, [
-        //     'nisn' => 'required',
-        //     'nama' => 'required|min:3|string',
-        //     'tpt_lahir' => 'required|min:3',
-        //     'tgl_lahir' => 'required',
-        //     'jns_kelamin' => 'required',
-        //     'agama' => 'required',
-        //     'alamat' => 'required',
-        //     'nama_ortu' => 'required',
-        //     'kelas' => 'required',
-        //     'asal_sklh' => 'required'
-        // ], $messages);
-
-        // $data = $request->all();
-        // // $data['image'] = $request->file('image')->store(
-        // //     'assets/gallery', 'public'
-        // );
-
-        // $item = Siswa::findOrFail($id);
-        // $item->update($data);
-
-        return redirect('/siswa')->with('status', 'Data Berhasil Diubah');
+        return redirect('/admin/siswa')->with('status', 'Data Berhasil Diubah');
     }
 
     /**
@@ -203,9 +216,9 @@ class SiswaController extends Controller
 
         $hapus_siswa = $item->user_id;
         User::where('id', $hapus_siswa)->delete();
-        Absensiswa::where('user_id', $hapus_siswa)->delete();
+        Absensisiswa::where('siswa_id', $id)->delete();
 
-        return redirect('/siswa')->with('status', 'Data berhasil Dihapus');
+        return redirect('/admin/siswa')->with('status', 'Data berhasil Dihapus');
     }
 
     public function profile()
@@ -222,9 +235,9 @@ class SiswaController extends Controller
     public function nilai(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id);
-        $siswa->mapel()->attach($request->mapel, ['nilai_uh1' => $request->nilai_uh1, 'nilai_uh2' => $request->nilai_uh2, 'uts' => $request->uts, 'uas' => $request->uas, 'status' => $request->status]);
+        $siswa->mapel()->attach($request->mapel, ['uts' => $request->uts, 'uas' => $request->uas, 'status' => $request->status]);
 
-        return redirect('siswa/'.$id.'/show')->with('status', 'Nilai Berhasil Ditambahkan');
+        return redirect('admin/siswa/'.$id.'/show')->with('status', 'Nilai Berhasil Ditambahkan');
     }
 
     public function nilaitambah($id, $idmapel)
@@ -243,11 +256,9 @@ class SiswaController extends Controller
     public function nilaiupdate(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id); 
-        $siswa->mapel()->updateExistingPivot($request->mapel, ['nilai_uh1' => $request->nilai_uh1, 'nilai_uh2' => $request->nilai_uh2, 'uts' => $request->uts, 'uas' => $request->uas, 'status' => $request->status]);
+        $siswa->mapel()->updateExistingPivot($request->mapel, ['uts' => $request->uts, 'uas' => $request->uas, 'status' => $request->status]);
 
-        // dd($siswa);
-
-        return redirect('siswa/'.$id.'/show')->with('status', 'Nilai Berhasil Ditambahkan');
+        return redirect('admin/siswa/'.$id.'/show')->with('status', 'Nilai Berhasil Ditambahkan');
     }
 
     public function lihatNilai()
@@ -269,12 +280,6 @@ class SiswaController extends Controller
         return view('pages.admin.siswa.jadwal', compact('items'));
     }
 
-    public function tugas()
-    {
-        $items = Tugas::orderBy('id', 'DESC')->get();
-        return view('pages.admin.siswa.tugas', compact('items'));
-    }
-
     public function exportExcel() 
     {
         return Excel::download(new SiswaExport, 'Siswa.xlsx');
@@ -291,35 +296,69 @@ class SiswaController extends Controller
 
         Excel::import(new SiswaImport, public_path('/DataSiswa/'.$namaFile));
 
-        return redirect('/siswa')->with('status', 'Data Berhasil Ditambahkan');
+        return redirect('/admin/siswa')->with('status', 'Data Berhasil Ditambahkan');
     }
 
     public function exportPdf()
     {
-        $siswa = Siswa::all();
-        $pdf = PDF::loadView('export.siswapdf',['siswa' => $siswa]);
+        // Meningkatkan batas waktu eksekusi untuk proses ekspor PDF
+        ini_set('max_execution_time', 300); // Menambah batas waktu menjadi 5 menit
+        
+        // Get data siswa urutkan berdasarkan kelas dan nama
+        $siswa = Siswa::with(['kelasAktif' => function($query) {
+                $query->orderBy('nama_kelas');
+            }])
+            ->select('siswas.*')
+            ->join('siswa_kelas', 'siswas.id', '=', 'siswa_kelas.siswa_id')
+            ->join('kelas', 'siswa_kelas.kelas_id', '=', 'kelas.id')
+            ->orderBy('kelas.nama_kelas')
+            ->orderBy('siswas.nama')
+            ->get();
+        
+        $pdf = PDF::loadView('export.siswapdf', ['siswa' => $siswa]);
+        
+        // Menggunakan setting yang lebih efisien
+        $pdf->setPaper('a4', 'landscape');
+        $pdf->setOptions(['dpi' => 100, 'defaultFont' => 'sans-serif']);
+        
         return $pdf->download('siswa.pdf');
     }
 
     public function exportNilaiPdf($id)
     {
+        // Meningkatkan batas waktu eksekusi
+        ini_set('max_execution_time', 300);
+        
         $siswa = Siswa::find($id);
         $matapelajarans = Mapel::all();
+        
         $pdf = PDF::loadView('export.nilaisiswapdf',
-            ['siswa' => $siswa],
-            ['matapelajarans' => $matapelajarans]
+            ['siswa' => $siswa, 'matapelajarans' => $matapelajarans]
         );
+        
+        // Mengoptimalkan rendering PDF
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions(['dpi' => 100, 'defaultFont' => 'sans-serif']);
+        
         return $pdf->download('nilaisiswa.pdf');
     }
 
     public function cetakNilai() 
     {
+        // Meningkatkan batas waktu eksekusi
+        ini_set('max_execution_time', 300);
+        
         $siswa = Auth::user()->name;
         $matapelajarans = Mapel::all();
+        
         $pdf = PDF::loadView('export.nilaipdf',
-            ['siswa' => $siswa],
-            ['matapelajarans' => $matapelajarans],
+            ['siswa' => $siswa, 'matapelajarans' => $matapelajarans]
         );
+        
+        // Mengoptimalkan rendering PDF
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions(['dpi' => 100, 'defaultFont' => 'sans-serif']);
+        
         return $pdf->download('nilaisiswa.pdf');
     }
 
@@ -333,7 +372,7 @@ class SiswaController extends Controller
         $this->timeZone('Asia/Jakarta');
         $user_id = Auth::user()->id;
         $date = date("Y-m-d");
-        $cek_absen = Absensiswa::where(['user_id' => $user_id, 'tanggal' => $date])
+        $cek_absen = Absensisiswa::where(['user_id' => $user_id, 'tanggal' => $date])
                             ->get()
                             ->first();
         if(is_null($cek_absen)) {
@@ -353,7 +392,7 @@ class SiswaController extends Controller
             // );
         } 
 
-        $items = Absensiswa::where('user_id', $user_id)->orderBy('id', 'DESC')->paginate(10);
+        $items = Absensisiswa::where('user_id', $user_id)->orderBy('id', 'DESC')->paginate(10);
         return view('pages.admin.siswa.absen', compact('items', 'info'));
     }
 
@@ -365,7 +404,7 @@ class SiswaController extends Controller
         $time = date("H:i:s");
         $note = $request->note;
 
-        $absen = new Absensiswa;
+        $absen = new Absensisiswa;
         
         // Absen Masuk
         if (isset($request["btnIn"])) {

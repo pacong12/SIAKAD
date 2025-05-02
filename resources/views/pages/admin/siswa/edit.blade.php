@@ -14,7 +14,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <form action="/siswa/{{$item->id}}/update" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('siswa.update', $item->id) }}" method="POST" enctype="multipart/form-data">
               @method('PUT')
               @csrf
               <div class="form-group">
@@ -79,11 +79,16 @@
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="jns_kelamin"><i class="fas fa-venus-mars"></i></label>
                   </div>
-                  <select class="custom-select" name="jns_kelamin">
-                    <option>-- Pilih --</option>
+                  <select class="custom-select @error('jns_kelamin') is-invalid @enderror" name="jns_kelamin" required>
+                    <option disabled selected>-- Pilih --</option>
                     <option value="L" @if($item->jns_kelamin == 'L') selected @endif>Laki-Laki</option>
                     <option value="P" @if($item->jns_kelamin == 'P') selected @endif>Perempuan</option>
                   </select>
+                  @error('jns_kelamin')
+                    <div class="invalid-feedback">
+                        Jenis kelamin harus dipilih
+                    </div>
+                  @enderror
                 </div>
               </div>
               <div class="form-group">
@@ -92,14 +97,19 @@
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="agama"><i class="fas fa-heart"></i></label>
                   </div>
-                  <select class="custom-select" name="agama">
-                    <option>-- Pilih --</option>
+                  <select class="custom-select @error('agama') is-invalid @enderror" name="agama" required>
+                    <option disabled selected>-- Pilih --</option>
                     <option value="Islam" @if($item->agama == 'Islam') selected @endif>Islam</option>
                     <option value="Kristen" @if($item->agama == 'Kristen') selected @endif>Kristen</option>
                     <option value="Katolik" @if($item->agama == 'Katolik') selected @endif>Katolik</option>
                     <option value="Hindu" @if($item->agama == 'Hindu') selected @endif>Hindu</option>
                     <option value="Budha" @if($item->agama == 'Budha') selected @endif>Budha</option>
                   </select>
+                  @error('agama')
+                    <div class="invalid-feedback">
+                        Agama harus dipilih
+                    </div>
+                  @enderror
                 </div>
               </div>
               <div class="form-group">
@@ -131,19 +141,16 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="kelas">Kelas</label>
+                <label for="kelas_id">Kelas</label>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <label class="input-group-text" for="kelas"><i class="fas fa-user-graduate"></i></label>
+                    <label class="input-group-text" for="kelas_id"><i class="fas fa-user-graduate"></i></label>
                   </div>
-                  <select class="custom-select" name="kelas">
-                    <option>-- Pilih --</option>
-                    <option value="1" @if($item->kelas == '1') selected @endif>1</option>
-                    <option value="2" @if($item->kelas == '2') selected @endif>2</option>
-                    <option value="3" @if($item->kelas == '3') selected @endif>3</option>
-                    <option value="4" @if($item->kelas == '4') selected @endif>4</option>
-                    <option value="5" @if($item->kelas == '5') selected @endif>5</option>
-                    <option value="6" @if($item->kelas == '6') selected @endif>6</option>
+                  <select class="custom-select" name="kelas_id">
+                    <option value="">-- Pilih Kelas --</option>
+                    @foreach($kelas as $k)
+                      <option value="{{ $k->id }}" {{ $item->kelasAktif->isNotEmpty() && $item->kelasAktif->first()->id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                    @endforeach
                   </select>
                 </div>
               </div>
@@ -167,7 +174,7 @@
                 <p class="text-danger">Masukan Foto Bila Perlu</p>
               </div>
               <button type="submit" class="btn btn-success btn-sm">Simpan</button>
-              <a href="/siswa" class="btn btn-secondary btn-sm">Kembali</a>
+              <a href="/admin/siswa" class="btn btn-secondary btn-sm">Kembali</a>
             </form>
           </div>
         </div>

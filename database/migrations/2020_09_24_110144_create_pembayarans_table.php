@@ -22,6 +22,8 @@ class CreatePembayaransTable extends Migration
             $table->date('tanggal');
             $table->string('jum_pemb');
             $table->string('keterangan');
+            $table->enum('status', ['belum lunas', 'lunas'])->default('belum lunas');
+            $table->string('bukti_pembayaran')->nullable();
             $table->timestamps();
         });
     }

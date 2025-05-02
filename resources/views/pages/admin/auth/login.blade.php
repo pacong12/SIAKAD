@@ -9,8 +9,8 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Login | SD Negeri Limbangan 06</title>
-  <link rel="shortcut icon" href="{{url('../../foto/bunayya.png')}}">
+  <title>Login | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</title>
+  <link rel="shortcut icon" href="{{url('../../foto/tutwuri.png')}}">
 
   <!-- Custom fonts for this template-->
   <link href="{{url('backend/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
@@ -39,11 +39,11 @@
               {{-- <div class="col-lg-6 d-none d-lg-block bg-login-image"></div> --}}
               <div class="col-lg-12">
                 <div class="p-5">
-                  <div class="bg-atas text-center mb-4">
-                    <img src="{{url('../../foto/bunayya.png')}}" alt="">
+                  <div class="bg-atas text-center mb-4 ">
+                    <img class="img-thumbnail" src="{{url('../../foto/tutwuri.png')}}" alt="" style="width: 100px; height: 100px;">
                   </div>
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Sistem Informasi Akademik SD Negeri Limbangan 06</h1>
+                    <h1 class="h4 text-gray-900 mb-4">Sistem Informasi Akademik {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</h1>
                   </div>
                   <form class="user" method="POST" action="/postlogin">
                     @csrf

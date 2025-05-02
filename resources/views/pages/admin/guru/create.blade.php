@@ -14,7 +14,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <form action="/guru/store" method="POST" enctype="multipart/form-data">
+            <form action="/admin/guru/store" method="POST" enctype="multipart/form-data">
               @csrf
               <div class="form-group">
                 <label for="nip">Nip</label>
@@ -126,7 +126,7 @@
               </div>
               <button type="submit" class="btn btn-success btn-sm">Simpan</button>
               <button type="reset" class="btn btn-warning btn-sm">Reset</button>
-              <a href="/guru" class="btn btn-secondary btn-sm">Kembali</a>
+              <a href="/admin/guru" class="btn btn-secondary btn-sm">Kembali</a>
             </form>
           </div>
         </div>

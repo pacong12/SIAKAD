@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Home | SD Negeri Limbangan 06
+    Home | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}
 @endsection
 
 @section('content')
@@ -53,14 +53,14 @@
                         </h1>
                         <p class="mb-5">
                             @if (auth()->user()->role == 'guru')
-                                Selamat Datang di Sistem Informasi Akademik SD Negeri Limbangan 06 Semarang <br>
+                                Selamat Datang di Sistem Informasi Akademik {{ \App\Sekolah::first()->nama ?? 'Sekolah' }} <br>
                                 {{-- @if (auth()->user()->role == 'guru')
                                     <a href="{{route('dashboard.guru')}}" class="btn btn-primarmt-3">Masuk Dashboard</a>
                                 @endif --}}
                             @endif
-                            {{-- @if (auth()->user()->role == 'siswa')
-                                Selamat Datang di Sistem Informasi Akademik SD Negeri Limbangan 06 Semarang <br>
-                            @endif --}}
+                            @if (auth()->user()->role == 'siswa')
+                                Selamat Datang di Sistem Informasi Akademik {{ \App\Sekolah::first()->nama ?? 'Sekolah' }} <br>
+                            @endif
                         </p>
                     @endif
                 </div>

@@ -14,16 +14,11 @@ class Guru extends Model
 
     public function mapel()
     {
-        return $this->belongsToMany(Mapel::class)->withPivot(['ruang', 'kelas', 'hari', 'jam_mulai', 'jam_selesai']);
+        return $this->belongsToMany(Mapel::class)->withPivot(['kelas', 'hari', 'jam_mulai', 'jam_selesai']);
     }
 
     public function jadwalmapel()
     {
         return $this->hasMany(Jadwalmapel::class);
-    }
-
-    public function pg()
-    {
-        return $this->hasMany('App\Penilaianguru');
     }
 }

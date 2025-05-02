@@ -16,6 +16,10 @@ class CreateJenispemsTable extends Migration
         Schema::create('jenispems', function (Blueprint $table) {
             $table->id();
             $table->string('jenis');
+            $table->decimal('nominal', 12, 2)->default(0);
+            $table->date('tanggal_mulai')->nullable();
+            $table->date('tanggal_selesai')->nullable();
+            $table->boolean('untuk_semua_kelas')->default(false);
             $table->timestamps();
         });
     }

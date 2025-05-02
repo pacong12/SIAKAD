@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Jadwalmapel extends Model
 {
     protected $fillable = [
-        'mapel_id', 'guru_id', 'ruang_id', 'kelas', 'hari', 'jam_mulai', 'jam_selesai'
+        'mapel_id', 'guru_id', 'kelas_id', 'hari', 'jam_mulai', 'jam_selesai'
     ];
 
     protected $hidden = [];
@@ -21,9 +21,9 @@ class Jadwalmapel extends Model
     {
         return $this->belongsTo(Guru::class);
     }
-
-    public function ruang()
+    
+    public function kelas()
     {
-        return $this->belongsTo(Ruang::class);
+        return $this->belongsTo(Kelas::class);
     }
 }

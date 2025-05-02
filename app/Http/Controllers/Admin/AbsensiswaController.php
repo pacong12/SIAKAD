@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\User;
-use App\Absensiswa;
+use App\Siswa;
+use App\Kelas;
+use App\Absensisiswa;
 use PDF;
 use App\Exports\AbsensiswaExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AbsensiswaController extends Controller
 {
@@ -20,7 +23,7 @@ class AbsensiswaController extends Controller
      */
     public function index()
     {
-        $items = Absensiswa::with(['user'])->get();
+        $items = Absensisiswa::with(['siswa', 'kelas'])->orderBy('tanggal', 'desc')->get();
 
         return view('pages.admin.absensiswa.index', compact('items'));
     }
@@ -96,25 +99,37 @@ class AbsensiswaController extends Controller
         return view('pages.admin.absensiswa.cetakAbsen');
     }
 
-    public function cetakAbsenPertanggal($tglawal, $tglakhir)
+    public function cetakAbsenPertanggal(Request $request, $tglawal = null, $tglakhir = null)
     {
-        // dd(["Tanggal Awal : ".$tglawal, "Tanggal Akhir : ".$tglakhir]);
-        $absenPertanggal = Absensiswa::all()->whereBetween('tanggal', [$tglawal, $tglakhir]);
+        // Ambil tanggal dari parameter URL atau dari request
+        $tglawal = $tglawal ?? $request->tglawal;
+        $tglakhir = $tglakhir ?? $request->tglakhir;
+        
+        // Validasi tanggal
+        if (!$tglawal || !$tglakhir) {
+            return redirect()->back()->with('error', 'Tanggal awal dan akhir harus diisi');
+        }
+        
+        // Ambil data absensi dalam rentang tanggal
+        $absenPertanggal = Absensisiswa::with(['siswa', 'kelas'])
+                            ->whereBetween('tanggal', [$tglawal, $tglakhir])
+                            ->orderBy('tanggal', 'desc')
+                            ->get();
 
-        $pdf = PDF::loadview('export.absenpertanggalsiswapdf', compact('absenPertanggal'));
-        return $pdf->download('laporan-absen.pdf');
+        $pdf = PDF::loadview('export.absenpertanggalsiswapdf', compact('absenPertanggal', 'tglawal', 'tglakhir'));
+        return $pdf->stream('laporan-absen-' . Carbon::parse($tglawal)->format('dmY') . '-' . Carbon::parse($tglakhir)->format('dmY') . '.pdf');
     }
 
     public function cetakPDF()
     {
-        $absen = Absensiswa::all();
+        $absen = Absensisiswa::with(['siswa', 'kelas'])->orderBy('tanggal', 'desc')->get();
 
         $pdf = PDF::loadview('export.absensiswapdf', compact('absen'));
-        return $pdf->download('laporan-absen-siswa.pdf');
+        return $pdf->stream('laporan-absen-siswa-' . date('dmY') . '.pdf');
     }
 
     public function cetakEXCEL()
     {
-        return Excel::download(new AbsensiswaExport, 'absen.xlsx');
+        return Excel::download(new AbsensiswaExport, 'absen-siswa-' . date('dmY') . '.xlsx');
     }
 }

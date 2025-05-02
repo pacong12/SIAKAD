@@ -11,14 +11,14 @@
         <!-- Page Heading -->
         <h1 class="h3 text-gray-800">Data Guru</h1>
         
-        <a href="/guru/exportexcel" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
-        <a href="/guru/exportpdf" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a>
+        <a href="/admin/guru/exportexcel" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
+        <a href="/admin/guru/exportpdf" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a>
         
         
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <a href="/guru/create" class="btn btn-primary btn-sm mb-3 px-3 py-2">
+            <a href="/admin/guru/create" class="btn btn-primary btn-sm mb-3 px-3 py-2">
               <i class="fas fa-plus mr-2"></i>
               Tambah Data Guru
             </a>
@@ -39,10 +39,10 @@
                         <td>{{$item->nip}}</td>
                         <td>{{$item->nama}}</td>
                         <td>
-                            <a href="/guru/{{$item->id}}/show" class="btn btn-circle btn-info btn-sm">
+                            <a href="/admin/guru/{{$item->id}}/show" class="btn btn-circle btn-info btn-sm">
                                 <i class="fa fa-eye"></i>
                             </a>
-                            <a href="/guru/{{$item->id}}/edit" class="btn btn-circle btn-warning btn-sm">
+                            <a href="/admin/guru/{{$item->id}}/edit" class="btn btn-circle btn-warning btn-sm">
                                 <i class="fa fa-edit"></i>
                             </a>
                             <a href="#" class="btn btn-sm btn-danger btn-circle delete" guru-nama="{{$item->nama}}" guru-id="{{$item->id}}">
@@ -89,7 +89,7 @@
           .then((willDelete) => {
               console.log(willDelete);
             if (willDelete) {
-              window.location = "guru/"+$guruid+"/destroy";
+              window.location = "/admin/guru/"+$guruid+"/destroy";
             } else {
               swal("Data Guru "+$gurunama+" Tidak Terhapus");
             }

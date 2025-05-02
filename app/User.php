@@ -54,16 +54,11 @@ class User extends Authenticatable
 
     public function mapel()
     {
-        return $this->belongsToMany(Mapel::class)->withPivot(['nilai_uh1', 'nilai_uh2', 'uts', 'uas', 'status', 'thn_akademik']);
-    }
-
-    public function absen()
-    {
-        return $this->hasMany('App\Absen');
+        return $this->belongsToMany(Mapel::class, 'nilai_siswa')->withPivot(['uts', 'uas', 'status', 'thn_akademik']);
     }
 
     public function absensiswa()
     {
-        return $this->hasMany('App\Absensiswa');
+        return $this->hasMany('App\Absensisiswa');
     }
 }

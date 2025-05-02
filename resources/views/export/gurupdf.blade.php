@@ -11,8 +11,8 @@
     <title>Data Guru</title>
   </head>
   <body>
-    {{-- <img src="{{url('foto/bunayya.png')}}" alt=""> --}}
-    <h3 class="text-center mb-3">Laporan Data Guru Bunayya</h3>
+    {{-- <img src="{{url('foto/tutwuri.png')}}" alt=""> --}}
+    <h3 class="text-center mb-3">Laporan Data Guru tutwuri</h3>
     <table class="table table-striped table-bordered text-center table-sm">
         <thead>
             <tr>

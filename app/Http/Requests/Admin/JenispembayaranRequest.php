@@ -24,7 +24,11 @@ class JenispembayaranRequest extends FormRequest
     public function rules()
     {
         return [
-            'jenis_pembayaran' => 'required',
+            'jenis' => 'required|string|max:255',
+            'nominal' => 'required|numeric|min:0',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'untuk_semua_kelas' => 'boolean'
         ];
     }
 }

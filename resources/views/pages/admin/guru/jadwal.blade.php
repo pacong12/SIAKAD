@@ -17,6 +17,25 @@
           @endif
         </h1>
 
+        <!-- Export Buttons -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card shadow">
+              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Ekspor Jadwal</h6>
+              </div>
+              <div class="card-body">
+                <a href="{{ url('/guru/jadwal/exportpdf/'.auth()->user()->guru->id) }}" class="btn btn-danger mr-2">
+                  <i class="fa fa-file-pdf mr-1"></i> Ekspor PDF
+                </a>
+                <a href="{{ url('/guru/jadwal/exportexcel/'.auth()->user()->guru->id) }}" class="btn btn-success">
+                  <i class="fa fa-file-excel mr-1"></i> Ekspor Excel
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
@@ -24,10 +43,8 @@
               <table class="table table-bordered text-center" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                   <tr>
-                    <th>Mapel</th>
-                    <th>Nama</th>
+                    <th>Mata Pelajaran</th>
                     <th>Kelas</th>
-                    <th>Ruang</th>
                     <th>Hari</th>
                     <th>Jam Mulai</th>
                     <th>Jam Selesai</th>
@@ -35,31 +52,28 @@
                 </thead>
                 <tbody>
                   @foreach ($items as $item)
-                    @if (auth()->user()->name === $item->guru->nama)
+                    @if (auth()->user()->guru->id === $item->guru_id)
                       <tr>
-                        <td>{{$item->mapel->nama_mapel}}</td>
-                        <td>{{$item->guru->nama}}</td>
-                        <td>{{$item->kelas}}</td>
-                        <td>{{$item->ruang->nama_ruang}}</td>
+                        <td>
+                          @if($item->mapel)
+                            {{$item->mapel->nama_mapel}}
+                          @else
+                            <span class="text-danger">Mapel tidak ditemukan</span>
+                          @endif
+                        </td>
+                        <td>
+                          @if($item->kelas)
+                            {{$item->kelas->nama_kelas}}
+                          @else
+                            <span class="text-danger">Kelas tidak ditemukan</span>
+                          @endif
+                        </td>
                         <td>{{$item->hari}}</td>
-                        <td>{{$item->jam_mulai}}</td>
-                        <td>{{$item->jam_selesai}}</td>
+                        <td>{{substr($item->jam_mulai, 0, 5)}}</td>
+                        <td>{{substr($item->jam_selesai, 0, 5)}}</td>
                       </tr>
                     @endif
                   @endforeach
-                  {{-- @forelse (auth()->user()->guru->mapel as $mapel)
-                      <tr>
-                          <td>{{$loop->iteration}}</td>
-                          <td>{{$mapel->nama_mapel}}</td>
-                          <td>{{$mapel->pivot->kelas}}</td>
-                          <td>{{$mapel->pivot->ruang}}</td>
-                          <td>{{$mapel->pivot->hari}}</td>
-                          <td>{{$mapel->pivot->jam_mulai}}</td>
-                          <td>{{$mapel->pivot->jam_selesai}}</td>
-                      </tr>
-                  @empty
-                      
-                  @endforelse --}}
                 </tbody>
               </table>
             </div>
@@ -80,7 +94,9 @@
       <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
       <script>
         $(document).ready(function() {
-          $('#dataTable').DataTable();
+          $('#dataTable').DataTable({
+            "order": [[ 2, "asc" ], [ 3, "asc" ]]
+          });
         } );
       </script>
       <script>

@@ -7,7 +7,6 @@ use App\Http\Requests\Admin\GuruRequest;
 use App\Guru;
 use App\User;
 use App\Mapel;
-use App\Absen;
 use App\Jadwalmapel;
 use App\Exports\GuruExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -70,7 +69,7 @@ class GuruController extends Controller
         
         Guru::create($data);
 
-        return redirect('guru')->with('status', 'Data Berhasil Ditambahkan');
+        return redirect('/admin/guru')->with('status', 'Data Berhasil Ditambahkan');
     }
 
     /**
@@ -112,12 +111,40 @@ class GuruController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Validasi manual karena tidak bisa menggunakan GuruRequest yang mewajibkan image
+        $this->validate($request, [
+            'nip' => 'required|unique:gurus,nip,'.$id,
+            'nama' => 'required|string|min:3',
+            'tpt_lahir' => 'required|min:3',
+            'tgl_lahir' => 'required',
+            'jns_kelamin' => 'required',
+            'agama' => 'required',
+            'alamat' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg'
+        ], [
+            'nip.unique' => 'NIP sudah digunakan',
+            'nip.required' => 'NIP tidak boleh kosong',
+            'nama.required' => 'Nama tidak boleh kosong',
+            'nama.min' => 'Nama minimal 3 karakter',
+            'nama.string' => 'Nama harus huruf',
+            'tpt_lahir.required' => 'Tempat tanggal lahir tidak boleh kosong',
+            'tpt_lahir.min' => 'Tempat tanggal lahir minimal 3 karakter',
+            'tgl_lahir.required' => 'Tanggal lahir tidak boleh kosong',
+            'alamat.required' => 'Alamat tidak boleh kosong',
+            'alamat.min' => 'Alamat minimal 3 karakter',
+            'image.image' => 'File harus gambar',
+            'image.mimes' => 'File harus berformat jpeg,jpg,gif,svg,png'
+        ]);
+        
         $data = Guru::findOrFail($id);
         $update_guru = $data->user_id;
 
-        if(request('image')) {
-            Storage::delete($data->image);
-            $image = request()->file('image')->store('assets/gallery', 'public');
+        if($request->hasFile('image')) {
+            // Hapus file lama jika ada
+            if($data->image && Storage::disk('public')->exists($data->image)) {
+                Storage::disk('public')->delete($data->image);
+            }
+            $image = $request->file('image')->store('assets/gallery', 'public');
         } elseif($data->image) {
             $image = $data->image;
         } else {
@@ -136,28 +163,14 @@ class GuruController extends Controller
         ]);
 
         $baru = User::find($update_guru);
-        $baru->name = $request->nama;
-        $baru->image = $image;
-        $baru->username = $request->nip;
-        $baru->password = bcrypt($request->nip);
-        $baru->remember_token = Str::random(60);
-        $baru->save();
-        // $request->validate([
-        //     'nip' => 'required',
-        //     'nama' => 'required',
-        //     'tpt_lahir' => 'required',
-        //     'tgl_lahir' => 'required',
-        //     'jns_kelamin' => 'required',
-        //     'agama' => 'required',
-        //     'alamat' => 'required'
-        // ]);
+        if($baru) {
+            $baru->name = $request->nama;
+            $baru->image = $image;
+            $baru->username = $request->nip;
+            $baru->save();
+        }
 
-        // $data = $request->all();
-
-        // $item = Guru::findOrFail($id);
-        // $item->update($data);
-
-        return redirect('/guru')->with('status', 'Data Berhasil Diubah');
+        return redirect('/admin/guru')->with('status', 'Data Berhasil Diubah');
     }
 
     /**
@@ -169,88 +182,20 @@ class GuruController extends Controller
     public function destroy($id)
     {
         $item = Guru::findOrFail($id);
+        
+        // Hapus file gambar jika ada
+        if($item->image && Storage::disk('public')->exists($item->image)) {
+            Storage::disk('public')->delete($item->image);
+        }
+        
         $item->delete();
 
         Jadwalmapel::where('guru_id', $id)->delete();
 
         $hapus_guru = $item->user_id;
         User::where('id', $hapus_guru)->delete();
-        Absen::where('user_id', $hapus_guru)->delete();
 
-        return redirect('/guru')->with('status', 'Data Berhasil Dihapus');
-    }
-
-    public function timeZone($location) 
-    {
-        return date_default_timezone_set($location);
-    }
-
-    public function absen() 
-    {
-        $this->timeZone('Asia/Jakarta');
-        $user_id = Auth::user()->id;
-        $date = date("Y-m-d");
-        $cek_absen = Absen::where(['user_id' => $user_id, 'tanggal' => $date])
-                            ->get()
-                            ->first();
-        if(is_null($cek_absen)) {
-            $info = array(
-                "status" => "Anda Belum Mengisi Absen Hari Ini",
-                "btnIn" => "",
-                "btnOut" => "disabled"
-            );
-        } elseif($cek_absen->time_out == NULL) {
-            $info = array(
-                "status" => "Jangan Lupa Absen Keluar",
-                "btnIn" => "disabled",
-                "btnOut" => ""
-            );
-        } else {
-            $info = array(
-                "status" => "Absensi Hari Ini Telah Berakhir",
-                "btnIn" => "disabled",
-                "btnOut" => "disabled"
-            );
-        }
-
-        $items = Absen::where('user_id', $user_id)->orderBy('id', 'DESC')->paginate(10);
-        return view('pages.admin.guru.absen', compact('items', 'info'));
-    }
-
-    public function absenpros(Request $request)
-    {
-        $this->timeZone('Asia/Jakarta');
-        $user_id = Auth::user()->id;
-        $date = date("Y-m-d");
-        $time = date("H:i:s");
-        $note = $request->note;
-
-        $absen = new Absen;
-        
-        // Absen Masuk
-        if (isset($request["btnIn"])) {
-            // Cek Double Data
-            $cek_double = $absen->where(['tanggal' => $date, 'user_id' => $user_id])
-                    ->count();
-            if($cek_double > 0) {
-                return redirect()->back();
-            }
-            $absen->create([
-                'user_id' => $user_id,
-                'tanggal' => $date,
-                'time_in' => $time,
-                'note' => $note]);
-            return redirect()->back(); 
-        } 
-        // Absen Keluar
-        elseif (isset($request["btnOut"])) {
-            $absen->where(['tanggal' => $date, 'user_id' => $user_id])
-                    ->update([
-                        'time_out' => $time,
-                        'note' => $note]);
-            return redirect()->back();
-        }
-        // return $request->all(); 
+        return redirect('/admin/guru')->with('status', 'Data Berhasil Dihapus');
     }
 
     public function profile()
@@ -265,8 +210,18 @@ class GuruController extends Controller
 
     public function exportPdf()
     {
-        $guru = Guru::all();
-        $pdf = PDF::loadView('export.gurupdf',['guru' => $guru]);
+        // Meningkatkan batas waktu eksekusi
+        ini_set('max_execution_time', 300);
+        
+        // Get data guru yang diurutkan berdasarkan nama
+        $guru = Guru::orderBy('nama')->get();
+        
+        $pdf = PDF::loadView('export.gurupdf', ['guru' => $guru]);
+        
+        // Menggunakan setting yang lebih efisien
+        $pdf->setPaper('a4', 'landscape');
+        $pdf->setOptions(['dpi' => 100, 'defaultFont' => 'sans-serif']);
+        
         return $pdf->download('guru.pdf');
     }   
 

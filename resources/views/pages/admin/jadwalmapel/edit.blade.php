@@ -14,19 +14,19 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-body">
-            <form action="/jadwalmapel/{{$item->id}}/update" method="POST">
+            <form action="/admin/jadwalmapel/{{$item->id}}/update" method="POST">
                 @method('PUT')
                 @csrf
                 <label for="guru_id">Guru</label>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="gurus_id"><i class="fas fa-user"></i></span>
+                    <span class="input-group-text" id="guru_id"><i class="fas fa-user"></i></span>
                   </div>
                   <select name="guru_id" required class="custom-select">
-                    <option value="{{$item->guru_id}}">-- Ubah Bila Perlu --</option>
-                    @foreach ($gurus as $gurus)
-                        <option value="{{$gurus->id}}">
-                            {{$gurus->nama}}
+                    <option value="">-- Pilih Guru --</option>
+                    @foreach ($gurus as $guru)
+                        <option value="{{$guru->id}}" {{ $item->guru_id == $guru->id ? 'selected' : '' }}>
+                            {{$guru->nama}}
                         </option>
                     @endforeach
                   </select>
@@ -34,54 +34,40 @@
                 <label for="mapel_id">Mapel</label>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="mapels_id"><i class="fas fa-book-reader"></i></span>
+                    <span class="input-group-text" id="mapel_id"><i class="fas fa-book-reader"></i></span>
                   </div>
-                  <select class="custom-select" name="mapel_id">
-                    <option value="{{$item->mapel_id}}">-- Ubah Bila Perlu --</option>
-                    @foreach ($mapels as $mapels)
-                        <option value="{{$mapels->id}}">
-                          {{$mapels->nama_mapel}}
+                  <select class="custom-select" name="mapel_id" required>
+                    <option value="">-- Pilih Mata Pelajaran --</option>
+                    @foreach ($mapels as $mapel)
+                        <option value="{{$mapel->id}}" {{ $item->mapel_id == $mapel->id ? 'selected' : '' }}>
+                          {{$mapel->nama_mapel}}
                         </option>
                     @endforeach
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="kelas">Kelas</label>
+                  <label for="kelas_id">Kelas</label>
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <label class="input-group-text" for="kelas"><i class="fas fa-user-graduate"></i></label>
+                      <label class="input-group-text" for="kelas_id"><i class="fas fa-user-graduate"></i></label>
                     </div>
-                    <select class="custom-select" name="kelas">
-                      <option>-- Pilih --</option>
-                      <option value="1" @if($item->kelas == '1') selected @endif>1</option>
-                      <option value="2" @if($item->kelas == '2') selected @endif>2</option>
-                      <option value="3" @if($item->kelas == '3') selected @endif>3</option>
-                      <option value="4" @if($item->kelas == '4') selected @endif>4</option>
-                      <option value="5" @if($item->kelas == '5') selected @endif>5</option>
-                      <option value="6" @if($item->kelas == '6') selected @endif>6</option>
+                    <select class="custom-select" name="kelas_id" required>
+                      <option value="">-- Pilih Kelas --</option>
+                      @foreach ($kelas as $k)
+                          <option value="{{$k->id}}" {{ $item->kelas_id == $k->id ? 'selected' : '' }}>
+                            {{$k->nama_kelas}}
+                          </option>
+                      @endforeach
                     </select>
                   </div>
-                </div>
-                <label for="ruang_id">Ruang</label>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="ruangs_id"><i class="fas fa-school"></i></span>
-                  </div>
-                  <select class="custom-select" name="ruang_id">
-                    <option value="{{$item->ruang_id}}">-- Ubah Bila Perlu --</option>
-                    @foreach ($ruangs as $ruangs)
-                        <option value="{{$ruangs->id}}">
-                          {{$ruangs->nama_ruang}}
-                        </option>
-                    @endforeach
-                  </select>
                 </div>
                 <label for="hari">Hari</label>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="hari"><i class="fas fa-cloud-sun"></i></span>
                   </div>
-                  <select class="custom-select" name="hari">
+                  <select class="custom-select" name="hari" required>
+                    <option value="">-- Pilih Hari --</option>
                     <option value="Senin" @if($item->hari == 'Senin') selected @endif>Senin</option>
                     <option value="Selasa" @if($item->hari == 'Selasa') selected @endif>Selasa</option>
                     <option value="Rabu" @if($item->hari == 'Rabu') selected @endif>Rabu</option>
@@ -96,7 +82,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="jam_mulai"><i class="far fa-clock"></i></span>
                     </div>
-                    <input type="time" class="form-control @error('jam_mulai') is-invalid @enderror" placeholder="Jam Mulai" name="jam_mulai" value="{{$item->jam_mulai}}">
+                    <input type="time" class="form-control @error('jam_mulai') is-invalid @enderror" placeholder="Jam Mulai" name="jam_mulai" value="{{$item->jam_mulai}}" required>
                     @error('jam_mulai')
                       <div class="invalid-feedback">
                           {{$message}}
@@ -110,7 +96,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="jam_selesai"><i class="far fa-clock"></i></span>
                     </div>
-                    <input type="time" class="form-control @error('jam_selesai') is-invalid @enderror" placeholder="Jam Selesai" name="jam_selesai" value="{{$item->jam_selesai}}">
+                    <input type="time" class="form-control @error('jam_selesai') is-invalid @enderror" placeholder="Jam Selesai" name="jam_selesai" value="{{$item->jam_selesai}}" required>
                     @error('jam_selesai')
                       <div class="invalid-feedback">
                           {{$message}}
@@ -119,7 +105,7 @@
                   </div>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm">Simpan</button>
-                <a href="/jadwalmapel" class="btn btn-secondary btn-sm">Kembali</a>
+                <a href="/admin/jadwalmapel" class="btn btn-secondary btn-sm">Kembali</a>
             </form>
           </div>
         </div>

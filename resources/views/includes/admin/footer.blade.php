@@ -2,7 +2,7 @@
 <footer class="sticky-footer bg-white">
     <div class="container my-auto">
       <div class="copyright text-center my-auto">
-        <span>Copyright &copy; SD Negeri Limbangan 06  <?php echo date("Y") ?> </span>
+        <span>Copyright &copy; {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}  <?php echo date("Y") ?> </span>
       </div>
     </div>
 </footer>

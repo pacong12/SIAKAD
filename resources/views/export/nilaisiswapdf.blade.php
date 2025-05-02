@@ -13,10 +13,8 @@
         <thead>
             <tr>
                 <th>Mapel</th>
-                <th>Nilai UH1</th>
-                <th>Nilai UH2</th>
-                <th>Nilai uts</th>
-                <th>Nilai uas</th>
+                <th>Nilai UTS</th>
+                <th>Nilai UAS</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -25,8 +23,6 @@
             @forelse ($siswa->mapel as $mapel)
                 <tr>
                     <td>{{$mapel->nama_mapel}}</td>
-                    <td>{{$mapel->pivot->nilai_uh1}}</td>
-                    <td>{{$mapel->pivot->nilai_uh2}}</td>
                     <td>{{$mapel->pivot->uts}}</td>
                     <td>{{$mapel->pivot->uas}}</td>
                     <td>{{$mapel->pivot->status}}</td>

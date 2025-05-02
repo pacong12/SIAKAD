@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Reset Password | SD Negeri Limbangan 06</title>
+  <title>Reset Password | {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</title>
 
   <!-- Custom fonts for this template-->
   <link href="{{url('backend/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
@@ -39,10 +39,10 @@
               <div class="col-lg-12">
                 <div class="p-5">
                   <div class="bg-atas text-center mb-4">
-                    <img src="{{url('../../foto/bunayya.png')}}" alt="">
+                    <img src="{{url('../../foto/tutwuri.png')}}" alt="">
                   </div>
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Sistem Informasi Akademik SD Negeri Limbangan 06</h1>
+                    <h1 class="h4 text-gray-900 mb-4">Sistem Informasi Akademik {{ \App\Sekolah::first()->nama ?? 'Sekolah' }}</h1>
                   </div>
                   <form class="user" method="POST" action="{{route('postreset')}}">
                     @csrf

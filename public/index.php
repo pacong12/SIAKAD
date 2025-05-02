@@ -1,5 +1,9 @@
 <?php
 
+// Meningkatkan batas waktu eksekusi secara global untuk aplikasi
+ini_set('max_execution_time', 300); // 5 menit
+ini_set('memory_limit', '512M');    // Meningkatkan batas memori juga
+
 /**
  * Laravel - A PHP Framework For Web Artisans
  *

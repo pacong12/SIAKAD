@@ -51,7 +51,7 @@
                         <td>{{$item->alamat}}</td>
                     </tr>
                 </table>
-                <a href="/guru" class="btn btn-secondary btn-sm">Kembali</a>
+                <a href="/admin/guru" class="btn btn-secondary btn-sm">Kembali</a>
             </div>
         </div>
 

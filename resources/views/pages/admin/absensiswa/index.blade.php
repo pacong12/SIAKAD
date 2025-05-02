@@ -11,8 +11,19 @@
         <!-- Page Heading -->
         <h1 class="h3 text-gray-800">Data Absen Siswa</h1>
         
-        <a href="{{route('absensiswa.cetakexcel')}}" class="btn btn-success btn-sm mb-3 px-3 py-2">Laporan Excel</a>
-        <a href="{{route('absensiswa.cetakpdf')}}" class="btn btn-danger btn-sm mb-3 px-3 py-2">Laporan PDF</a>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <a href="{{route('absensiswa.cetakpdf')}}" class="btn btn-danger btn-sm px-3 py-2 mr-2">
+                    <i class="fas fa-file-pdf mr-1"></i> Laporan PDF
+                </a>
+                <a href="{{route('absensiswa.cetakexcel')}}" class="btn btn-success btn-sm px-3 py-2 mr-2">
+                    <i class="fas fa-file-excel mr-1"></i> Laporan Excel
+                </a>
+                <a href="{{route('absensiswa.cetakAbsen')}}" class="btn btn-primary btn-sm px-3 py-2">
+                    <i class="fas fa-calendar-alt mr-1"></i> Laporan Per Tanggal
+                </a>
+            </div>
+        </div>
 
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
@@ -22,25 +33,38 @@
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>Nama</th>
+                    <th>Nama Siswa</th>
+                    <th>Kelas</th>
                     <th>Tanggal</th>
-                    <th>Jam Masuk</th>
-                    <th>Catatan</th>
+                    <th>Status</th>
+                    <th>Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   @foreach ($items as $item)
                     <tr>
                       <td>{{$loop->iteration}}</td>
-                      <td>{{$item->user->name}}</td>
+                      <td>{{$item->siswa->nama ?? 'Data tidak tersedia'}}</td>
+                      <td>{{$item->kelas->nama_kelas ?? 'Data tidak tersedia'}}</td>
                       <td>{{$item->tanggal}}</td>
-                      <td>{{$item->time_in}}</td>
-                      <td>{{$item->note}}</td>
+                      <td>
+                        @if($item->status == 'hadir')
+                          <span class="badge badge-success">Hadir</span>
+                        @elseif($item->status == 'sakit')
+                          <span class="badge badge-warning">Sakit</span>
+                        @elseif($item->status == 'izin')
+                          <span class="badge badge-info">Izin</span>
+                        @elseif($item->status == 'alpa')
+                          <span class="badge badge-danger">Alpa</span>
+                        @else
+                          <span class="badge badge-secondary">{{$item->status}}</span>
+                        @endif
+                      </td>
+                      <td>{{$item->keterangan ?? '-'}}</td>
                     </tr>
                   @endforeach
                 </tbody>
               </table>
-              {{-- {{$items->links()}} --}}
             </div>
           </div>
         </div>
@@ -63,27 +87,6 @@
         $(document).ready(function() {
           $('#tableAbsen').DataTable();
         } );
-      </script>
-      <script>
-        $('.delete').click(function(){
-          var $absennama = $(this).attr('absen-nama');
-          var $absenid = $(this).attr('absen-id');
-          swal({
-            title: "Apakah Kamu Yakin",
-            text: "Data Absen "+$absennama+" Akan Terhapus",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-          })
-          .then((willDelete) => {
-              console.log(willDelete);
-            if (willDelete) {
-              window.location = "absen/"+$absenid+"/destroy";
-            } else {
-              swal("Data "+$absennama+" Tidak Terhapus");
-            }
-          });
-        })
       </script>
       <script>
         @if (Session::has('status'))

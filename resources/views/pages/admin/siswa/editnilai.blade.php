@@ -30,34 +30,6 @@
                 </select>
                 </div>
                 <div class="form-group">
-                    <label for="nilai">Nilai UH1</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text" id="nilai"><i class="far fa-id-card"></i></span>
-                      </div>
-                      <input type="text" class="form-control @error('nilai') is-invalid @enderror" placeholder="Nilai UH1" name="nilai_uh1" value="{{$nilai->pivot->nilai_uh1}}">
-                      @error('nilai')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
-                      @enderror
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="nilai">Nilai UH2</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text" id="nilai"><i class="far fa-id-card"></i></span>
-                      </div>
-                      <input type="text" class="form-control @error('nilai') is-invalid @enderror" placeholder="Nilai UH2" name="nilai_uh2" value="{{$nilai->pivot->nilai_uh2}}">
-                      @error('nilai')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
-                      @enderror
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="nilai">UTS</label>
                     <div class="input-group">
                       <div class="input-group-prepend">
@@ -123,12 +95,6 @@
 
         $.fn.editable.defaults.mode = 'inline';
 
-        $(document).ready(function() {
-            $('.nilai_uh1').editable();
-        });
-        $(document).ready(function() {
-            $('.nilai_uh2').editable();
-        });
         $(document).ready(function() {
             $('.uts').editable();
         });
