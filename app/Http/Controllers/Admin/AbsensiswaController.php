@@ -116,7 +116,10 @@ class AbsensiswaController extends Controller
                             ->orderBy('tanggal', 'desc')
                             ->get();
 
-        $pdf = PDF::loadview('export.absenpertanggalsiswapdf', compact('absenPertanggal', 'tglawal', 'tglakhir'));
+        // Ambil data sekolah
+        $sekolah = \App\Sekolah::first();
+
+        $pdf = PDF::loadview('export.absenpertanggalsiswapdf', compact('absenPertanggal', 'tglawal', 'tglakhir', 'sekolah'));
         return $pdf->stream('laporan-absen-' . Carbon::parse($tglawal)->format('dmY') . '-' . Carbon::parse($tglakhir)->format('dmY') . '.pdf');
     }
 
@@ -124,7 +127,10 @@ class AbsensiswaController extends Controller
     {
         $absen = Absensisiswa::with(['siswa', 'kelas'])->orderBy('tanggal', 'desc')->get();
 
-        $pdf = PDF::loadview('export.absensiswapdf', compact('absen'));
+        // Ambil data sekolah
+        $sekolah = \App\Sekolah::first();
+
+        $pdf = PDF::loadview('export.absensiswapdf', compact('absen', 'sekolah'));
         return $pdf->stream('laporan-absen-siswa-' . date('dmY') . '.pdf');
     }
 

@@ -12,6 +12,8 @@ use App\Kelas;
 use App\User;
 use Illuminate\Http\Request;
 use DB;
+use PDF;
+use App\Sekolah;
 
 class NilaiController extends Controller
 {
@@ -109,11 +111,27 @@ class NilaiController extends Controller
 
     public function detailNilai($id)
     {
-        $item = Siswa::findOrFail($id);
-        $matapelajarans = Mapel::all();
+        $item = Siswa::with(['mapel' => function($query) {
+            $query->withPivot(['uts', 'uas', 'status', 'thnakademik_id']);
+        }])->findOrFail($id);
+        
         $thnakademiks = Thnakademik::all();
-
-        return view('pages.admin.siswa.detailNilai', compact('item', 'matapelajarans', 'thnakademiks'));
+        
+        // Ambil kelas aktif siswa
+        $kelasAktif = $item->kelasAktif->first();
+        
+        // Ambil mapel dari jadwalmapels berdasarkan kelas aktif
+        $matapelajarans = [];
+        if ($kelasAktif) {
+            $matapelajarans = Jadwalmapel::with('mapel')
+                ->where('kelas_id', $kelasAktif->id)
+                ->get()
+                ->pluck('mapel')
+                ->unique('id')
+                ->values();
+        }
+        
+        return view('pages.admin.siswa.detailNilai', compact('item', 'thnakademiks', 'matapelajarans'));
     }
 
     public function nilai(Request $request, $id)
@@ -225,12 +243,48 @@ class NilaiController extends Controller
 
     public function cetakNilaiPeraka($id, $thnakademik)
     {
-        // dd(["Tanggal Awal : ".$tglawal, "Tanggal Akhir : ".$tglakhir]);
-        $cetakPeraka = Siswa::findOrFail($id)->thnakademik('tahun_akademik', [$thnakademik]);
+        $siswa = Siswa::with(['mapel' => function($query) use ($thnakademik) {
+            $query->wherePivot('thnakademik_id', $thnakademik)
+                  ->withPivot(['uts', 'uas', 'status'])
+                  ->orderBy('nama_mapel');
+        }])->findOrFail($id);
 
-        dd($cetakPeraka);
-
-        $pdf = PDF::loadview('export.absenpertanggalpdf', compact('absenPertanggal'));
-        return $pdf->download('laporan-absen.pdf');
+        $thnakademikData = Thnakademik::findOrFail($thnakademik);
+        $sekolah = Sekolah::first();
+        
+        // Ambil wali kelas
+        $waliKelas = $siswa->kelasAktif->first()->guru ?? null;
+        
+        // Ambil data guru mapel dari jadwalmapels
+        $kelasAktif = $siswa->kelasAktif->first();
+        $guruMapel = [];
+        if ($kelasAktif) {
+            $jadwalMapel = Jadwalmapel::with(['mapel', 'guru'])
+                ->where('kelas_id', $kelasAktif->id)
+                ->get();
+            
+            foreach ($jadwalMapel as $jadwal) {
+                $guruMapel[$jadwal->mapel_id] = $jadwal->guru->nama ?? '-';
+            }
+        }
+        
+        // Hitung rata-rata nilai
+        $totalNilai = 0;
+        $jumlahMapel = count($siswa->mapel);
+        foreach($siswa->mapel as $mapel) {
+            $totalNilai += ($mapel->pivot->uts + $mapel->pivot->uas) / 2;
+        }
+        $rataRata = $jumlahMapel > 0 ? round($totalNilai / $jumlahMapel, 2) : 0;
+        
+        $pdf = PDF::loadview('export.cetakNilaiPDF', [
+            'siswa' => $siswa,
+            'thnakademik' => $thnakademikData,
+            'rataRata' => $rataRata,
+            'sekolah' => $sekolah,
+            'waliKelas' => $waliKelas,
+            'guruMapel' => $guruMapel
+        ]);
+        
+        return $pdf->download('nilai-'.$siswa->nama.'-'.$thnakademikData->tahun_akademik.'.pdf');
     }
 }

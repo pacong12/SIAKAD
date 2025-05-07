@@ -53,7 +53,7 @@
                     </div>
                     <select class="custom-select" name="role">
                       <option>-- Pilih --</option>
-                      <option value="siswa" @if($item->role == 'siswa') selected @endif>Siswa</option>
+                      <!-- <option value="siswa" @if($item->role == 'siswa') selected @endif>Siswa</option> -->
                       <option value="admin" @if($item->role == 'admin') selected @endif>Admin</option>
                       <option value="guru" @if($item->role == 'guru') selected @endif>Guru</option>
                     </select>

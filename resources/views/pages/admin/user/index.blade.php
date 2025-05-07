@@ -34,9 +34,11 @@
                   </tr>
                 </thead>
                 <tbody>
+                  @php $no = 1 @endphp
                   @forelse ($items as $item)
+                    @if($item->role != 'siswa')
                     <tr>
-                        <td>{{$loop->iteration}}</td>
+                        <td>{{$no++}}</td>
                         <td>{{$item->name}}</td>
                         <td>{{$item->username}}</td>
                         <td>{{$item->role}}</td>
@@ -47,7 +49,7 @@
                             <a href="#" class="btn btn-sm btn-circle btn-danger delete" user-id="{{$item->id}}">
                               <i class="fa fa-trash"></i>
                             </a>
-                            {{-- <form action="{{route('user.destroy', $item->id)}}" onclick=”return confirm(‘Yakin Hapus?’)” method="POST" class="d-inline">
+                            {{-- <form action="{{route('user.destroy', $item->id)}}" onclick="return confirm('Yakin Hapus?')" method="POST" class="d-inline">
                                 @csrf
                                 @method('delete')
                                 <button class="btn btn-circle btn-sm btn-danger">
@@ -56,6 +58,7 @@
                             </form> --}}
                         </td>
                     </tr>
+                    @endif
                   @empty
                     <tr>
                         <td colspan="4" class="text-center">

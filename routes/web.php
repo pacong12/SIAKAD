@@ -164,7 +164,7 @@ Route::prefix('/')
             
             Route::prefix('siswa')->group(function() {
                 Route::get('{siswa}/nilai', 'NilaiController@detail');
-                Route::get('{siswa}/nilai/detail', 'NilaiController@detailNilai');
+                Route::get('{siswa}/nilai/detail', 'NilaiController@detailNilai')->name('siswa.nilai.detail');
                 Route::post('{siswa}/nilaitambah', 'NilaiController@nilai');
                 Route::get('{id}/{idmapel}/nilaitambah', 'NilaiController@nilaitambah');
                 Route::get('{id}/{idmapel}/hapus', 'NilaiController@nilaihapus');

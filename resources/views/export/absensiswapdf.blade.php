@@ -1,96 +1,207 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
-    <title>Laporan Data Absen Siswa</title>
-    <style>
-      table {
-        border-collapse: collapse;
-        width: 100%;
-      }
-      table, th, td {
-        border: 1px solid black;
-      }
-      th, td {
-        padding: 5px;
-        text-align: center;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      .logo {
-        text-align: center;
-        margin-bottom: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <div class="logo">
-        <!-- Logo sekolah jika ada -->
-      </div>
-      <h3>Laporan Data Absen Siswa</h3>
-      <p>Tanggal: {{ date('d/m/Y') }}</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Laporan Absensi Siswa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 70px;
+      height: auto;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .subtitle {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .address {
+      font-size: 12px;
+      margin: 5px 0 15px;
+    }
+    .report-title {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+      text-decoration: underline;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+    td {
+      padding: 6px 8px;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .summary {
+      width: 100%;
+      margin-top: 20px;
+    }
+    .summary-item {
+      margin-bottom: 5px;
+    }
+    .signature {
+      margin-top: 50px;
+      text-align: right;
+      padding-right: 50px;
+    }
+    .badge {
+      padding: 3px 8px;
+      border-radius: 3px;
+      display: inline-block;
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .badge-success {
+      background-color: #28a745;
+      color: white;
+    }
+    .badge-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    .badge-info {
+      background-color: #17a2b8;
+      color: white;
+    }
+    .badge-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    @php
+      $sekolah = \App\Sekolah::first();
+    @endphp
+    
+    @if($sekolah && isset($sekolah->logo))
+      <img src="{{ public_path('storage/'.$sekolah->logo) }}" class="logo">
+    @endif
+    
+    <div class="title">{{ $sekolah ? $sekolah->nama_sekolah : 'SEKOLAH' }}</div>
+    <div class="subtitle">{{ $sekolah ? $sekolah->tingkat : 'TINGKAT PENDIDIKAN' }}</div>
+    <div class="address">{{ $sekolah ? $sekolah->alamat.', Telp: '.$sekolah->telepon : 'Alamat Sekolah' }}</div>
+    <hr style="border: 1px solid #000;">
+  </div>
+  
+  <div class="report-title">
+    LAPORAN ABSENSI SISWA
+  </div>
+  
+  <div class="summary">
+    <div style="float: left; width: 70%;">
+      <table border="0" style="border: none;">
+        <tr style="border: none;">
+          <td style="border: none; width: 150px;"><strong>Total Data</strong></td>
+          <td style="border: none; width: 10px;">:</td>
+          <td style="border: none;">{{ count($absen) }} data</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none;"><strong>Tanggal</strong></td>
+          <td style="border: none;">:</td>
+          <td style="border: none;">{{ date('d F Y') }}</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none;"><strong>Status Hadir</strong></td>
+          <td style="border: none;">:</td>
+          <td style="border: none;">{{ $absen->where('status', 'hadir')->count() }} siswa</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none;"><strong>Status Sakit</strong></td>
+          <td style="border: none;">:</td>
+          <td style="border: none;">{{ $absen->where('status', 'sakit')->count() }} siswa</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none;"><strong>Status Izin</strong></td>
+          <td style="border: none;">:</td>
+          <td style="border: none;">{{ $absen->where('status', 'izin')->count() }} siswa</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none;"><strong>Status Alpa</strong></td>
+          <td style="border: none;">:</td>
+          <td style="border: none;">{{ $absen->where('status', 'alpa')->count() }} siswa</td>
+        </tr>
+      </table>
     </div>
-
-    <table class="table table-striped table-bordered text-center table-sm">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Siswa</th>
-                <th>Kelas</th>
-                <th>Tanggal</th>
-                <th>Status</th>
-                <th>Keterangan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($absen as $a)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $a->siswa->nama ?? 'Data tidak tersedia' }}</td>
-                    <td>{{ $a->kelas->nama_kelas ?? 'Data tidak tersedia' }}</td>
-                    <td>{{ date('d/m/Y', strtotime($a->tanggal)) }}</td>
-                    <td>
-                      @if($a->status == 'hadir')
-                        Hadir
-                      @elseif($a->status == 'sakit')
-                        Sakit
-                      @elseif($a->status == 'izin')
-                        Izin
-                      @elseif($a->status == 'alpa')
-                        Alpa
-                      @else
-                        {{ $a->status }}
-                      @endif
-                    </td>
-                    <td>{{ $a->keterangan ?? '-' }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">
-                        Data Kosong
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <div style="margin-top: 30px; text-align: right;">
-      <p>................., {{ date('d F Y') }}</p>
-      <br><br><br>
-      <p>______________________</p>
-      <p>Kepala Sekolah</p>
-    </div>
-  </body>
+    <div style="clear: both;"></div>
+  </div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th width="5%">No</th>
+        <th width="10%">Tanggal</th>
+        <th width="15%">NISN</th>
+        <th width="25%">Nama Siswa</th>
+        <th width="15%">Kelas</th>
+        <th width="10%">Status</th>
+        <th width="20%">Keterangan</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse ($absen as $index => $a)
+        <tr>
+          <td class="text-center">{{ $index + 1 }}</td>
+          <td>{{ \Carbon\Carbon::parse($a->tanggal)->format('d-m-Y') }}</td>
+          <td>{{ $a->siswa->nisn ?? '-' }}</td>
+          <td>{{ $a->siswa->nama ?? 'Data tidak tersedia' }}</td>
+          <td class="text-center">{{ $a->kelas->nama_kelas ?? 'Data tidak tersedia' }}</td>
+          <td class="text-center">
+            @if($a->status == 'hadir')
+              <span class="badge badge-success">Hadir</span>
+            @elseif($a->status == 'sakit')
+              <span class="badge badge-warning">Sakit</span>
+            @elseif($a->status == 'izin')
+              <span class="badge badge-info">Izin</span>
+            @elseif($a->status == 'alpa')
+              <span class="badge badge-danger">Alpa</span>
+            @else
+              {{ $a->status }}
+            @endif
+          </td>
+          <td>{{ $a->keterangan ?? '-' }}</td>
+        </tr>
+      @empty
+        <tr>
+          <td colspan="7" class="text-center">Tidak ada data absensi</td>
+        </tr>
+      @endforelse
+    </tbody>
+  </table>
+  
+  <div class="signature">
+    <p>{{ $sekolah ? $sekolah->kota : 'Kota' }}, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
+    <p>Kepala Sekolah</p>
+    <br><br><br>
+    <p><strong>{{ $sekolah ? $sekolah->kepala_sklh : 'Kepala Sekolah' }}</strong></p>
+  </div>
+</body>
 </html>

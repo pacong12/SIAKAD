@@ -9,7 +9,7 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-3 text-gray-800">Daftar Siswa Kelas {{ $kelas->nama_kelas }}</h1>
+        <h1 class="h3 mb-3 text-gray-800">Daftar Siswa {{ $kelas->nama_kelas }}</h1>
         
         <!-- Info Card -->
         <div class="card shadow mb-4">
@@ -162,11 +162,11 @@
                                 <td>{{ $siswa->nisn }}</td>
                                 <td>{{ $siswa->nama }}</td>
                                 <td>
-                                    <a href="/siswa/{{ $siswa->id }}/nilai/detail" class="btn btn-sm btn-info">
+                                    <a href="{{ route('siswa.nilai.detail', $siswa->id) }}" class="btn btn-sm btn-info">
                                         <i class="fa fa-eye mr-1"></i> Lihat Nilai
-                          </a>
-                        </td>
-                    </tr>
+                                    </a>
+                                </td>
+                            </tr>
                             @empty
                             <tr>
                                 <td colspan="4" class="text-center">Tidak ada siswa di kelas ini</td>

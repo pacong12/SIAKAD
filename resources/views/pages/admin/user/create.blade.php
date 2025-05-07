@@ -68,7 +68,7 @@
                       <option>-- Pilih --</option>
                       <option value="admin">Admin</option>
                       <option value="guru">Guru</option>
-                      <option value="siswa">Siswa</option>
+                      <!-- <option value="siswa">Siswa</option> -->
                     </select>
                   </div>
                 </div>

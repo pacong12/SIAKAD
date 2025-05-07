@@ -3,23 +3,24 @@
 @section('title', 'Input Absensi Siswa')
 
 @section('content')
-<div class="main-content">
-    <section class="section">
-        <div class="section-header">
-            <h1>Input Absensi Siswa</h1>
-            <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item"><a href="{{ route('guru.absensi.index') }}">Absensi</a></div>
-                <div class="breadcrumb-item active">Input Absensi</div>
-            </div>
-        </div>
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Input Absensi Siswa</h1>
+        <a href="{{ route('guru.absensi.index') }}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
+        </a>
+    </div>
 
-        <div class="section-body">
-            <h2 class="section-title">Kelas {{ $kelasInfo->nama_kelas }}</h2>
-            <p class="section-lead">Input data absensi siswa untuk kelas {{ $kelasInfo->nama_kelas }}</p>
-            
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-12">
             @if (session('status'))
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('status') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
             @endif
 
@@ -32,11 +33,15 @@
                     </ul>
                 </div>
             @endif
-            
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
             <!-- Tanggal Filter -->
-            <div class="card mb-4">
+            <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h4 class="m-0 font-weight-bold text-primary">Pilih Tanggal</h4>
+                    <h6 class="m-0 font-weight-bold text-primary">Kelas {{ $kelasInfo->nama_kelas }} - Pilih Tanggal</h6>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('guru.absensi.proses', $kelasInfo->id) }}" method="GET" class="row">
@@ -44,18 +49,93 @@
                             <div class="input-group">
                                 <input type="date" name="tanggal" class="form-control" value="{{ $tanggal }}" required>
                                 <div class="input-group-append">
-                                    <button type="submit" class="btn btn-primary">Tampilkan</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search fa-sm"></i> Tampilkan
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            
-            <!-- Daftar Siswa -->
+        </div>
+    </div>
+
+    <!-- Statistik Absensi -->
+    @if(count($siswa) > 0)
+        <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Hadir</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalAbsen['hadir'] ?? 0 }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-check fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Sakit</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalAbsen['sakit'] ?? 0 }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-thermometer-half fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Izin</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalAbsen['izin'] ?? 0 }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-envelope fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Alpa</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalAbsen['alpa'] ?? 0 }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-times fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Daftar Siswa -->
+    <div class="row">
+        <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h4>Absensi Siswa Tanggal: {{ \Carbon\Carbon::parse($tanggal)->format('d-m-Y') }}</h4>
+                    <h6 class="m-0 font-weight-bold text-primary">Absensi Siswa Tanggal: {{ \Carbon\Carbon::parse($tanggal)->format('d-m-Y') }}</h6>
                 </div>
                 <div class="card-body">
                     @if(count($siswa) > 0)
@@ -65,10 +145,10 @@
                             <input type="hidden" name="tanggal" value="{{ $tanggal }}">
                             
                             <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <th width="5%">#</th>
+                                            <th width="5%" class="text-center">#</th>
                                             <th width="15%">NISN</th>
                                             <th width="25%">Nama Siswa</th>
                                             <th width="40%">Status Kehadiran</th>
@@ -78,7 +158,7 @@
                                     <tbody>
                                         @foreach($siswa as $index => $s)
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
+                                                <td class="text-center">{{ $index + 1 }}</td>
                                                 <td>{{ $s->nisn }}</td>
                                                 <td>{{ $s->nama }}</td>
                                                 <td>
@@ -137,8 +217,10 @@
                                 </table>
                             </div>
                             
-                            <div class="card-footer text-right">
-                                <button type="submit" class="btn btn-primary">Simpan Absensi</button>
+                            <div class="text-right mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save fa-sm text-white-50"></i> Simpan Absensi
+                                </button>
                             </div>
                         </form>
                     @else
@@ -148,86 +230,23 @@
                     @endif
                 </div>
             </div>
-            
-            <!-- Statistik Absensi -->
-            @if(count($siswa) > 0)
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-success">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Hadir</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ $totalAbsen['hadir'] ?? 0 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-warning">
-                                <i class="fas fa-thermometer-half"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Sakit</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ $totalAbsen['sakit'] ?? 0 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-info">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Izin</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ $totalAbsen['izin'] ?? 0 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-danger">
-                                <i class="fas fa-times"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Alpa</h4>
-                                </div>
-                                <div class="card-body">
-                                    {{ $totalAbsen['alpa'] ?? 0 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
-    </section>
+    </div>
 </div>
 @endsection
 
-@push('scripts')
+@push('addon-script')
 <script>
     $(document).ready(function() {
-        $('.table').DataTable({
+        $('#dataTable').DataTable({
             "pageLength": 25,
             "ordering": true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-            }
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [3, 4] }
+            ]
         });
     });
 </script>

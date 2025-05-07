@@ -91,6 +91,36 @@ class GuruAbsensiController extends Controller
             $kelasId = $request->kelas_id;
             $tanggal = $request->tanggal;
             
+            // Ambil data guru dari user yang sedang login
+            $user = Auth::user();
+            
+            // Debug informasi user
+            \Log::info('User ID: ' . $user->id);
+            \Log::info('User Role: ' . $user->role);
+            
+            // Cek jika user memiliki data guru
+            $guruId = null;
+            if ($user && $user->guru) {
+                $guruId = $user->guru->id;
+                \Log::info('Guru ID dari relasi: ' . $guruId);
+            } else {
+                // Jika tidak ada relasi guru, coba cari guru berdasarkan user_id
+                $guru = \App\Guru::where('user_id', $user->id)->first();
+                if ($guru) {
+                    $guruId = $guru->id;
+                    \Log::info('Guru ID dari query: ' . $guruId);
+                } else {
+                    // Jika masih tidak ada, cari guru pertama sebagai fallback
+                    $guru = \App\Guru::first();
+                    if ($guru) {
+                        $guruId = $guru->id;
+                        \Log::info('Guru ID fallback: ' . $guruId);
+                    } else {
+                        throw new \Exception('Tidak ada data guru di database. Silakan tambahkan data guru terlebih dahulu.');
+                    }
+                }
+            }
+            
             // Hapus absensi yang sudah ada untuk kelas dan tanggal tersebut
             Absensisiswa::where('tanggal', $tanggal)
                         ->where('kelas_id', $kelasId)
@@ -105,7 +135,7 @@ class GuruAbsensiController extends Controller
                     $absensi->tanggal = $tanggal;
                     $absensi->status = $request->status[$siswaId];
                     $absensi->keterangan = $request->keterangan[$siswaId] ?? null;
-                    $absensi->guru_id = Auth::id();
+                    $absensi->guru_id = $guruId;
                     $absensi->save();
                 }
             }
@@ -115,6 +145,7 @@ class GuruAbsensiController extends Controller
             return redirect()->back()->with('status', 'Data absensi berhasil disimpan');
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Error menyimpan absensi: ' . $e->getMessage());
             return redirect()->back()->withErrors(['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
@@ -223,8 +254,25 @@ class GuruAbsensiController extends Controller
             }
         }
         
+        // Buat nama file yang lebih spesifik
+        $filename = 'laporan-absensi-siswa';
+        if ($request->has('kelas_id') && $request->kelas_id) {
+            $kelas = Kelas::find($request->kelas_id);
+            $filename .= '-kelas-' . str_replace(' ', '-', strtolower($kelas->nama_kelas));
+        }
+        
+        if ($request->has('tanggal_mulai') && $request->tanggal_mulai) {
+            $filename .= '-' . Carbon::parse($request->tanggal_mulai)->format('dmY');
+            
+            if ($request->has('tanggal_akhir') && $request->tanggal_akhir) {
+                $filename .= '-' . Carbon::parse($request->tanggal_akhir)->format('dmY');
+            }
+        }
+        
+        $filename .= '.pdf';
+        
         $pdf = PDF::loadView('pages.admin.guru.cetak-absensi', compact('absensi', 'rangkuman', 'judul'));
-        return $pdf->stream('laporan-absensi-siswa.pdf');
+        return $pdf->download($filename);
     }
     
     /**
@@ -232,6 +280,23 @@ class GuruAbsensiController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        return Excel::download(new AbsensiSiswaExport($request), 'laporan-absensi-siswa.xlsx');
+        // Buat nama file yang lebih spesifik
+        $filename = 'laporan-absensi-siswa';
+        if ($request->has('kelas_id') && $request->kelas_id) {
+            $kelas = Kelas::find($request->kelas_id);
+            $filename .= '-kelas-' . str_replace(' ', '-', strtolower($kelas->nama_kelas));
+        }
+        
+        if ($request->has('tanggal_mulai') && $request->tanggal_mulai) {
+            $filename .= '-' . Carbon::parse($request->tanggal_mulai)->format('dmY');
+            
+            if ($request->has('tanggal_akhir') && $request->tanggal_akhir) {
+                $filename .= '-' . Carbon::parse($request->tanggal_akhir)->format('dmY');
+            }
+        }
+        
+        $filename .= '.xlsx';
+        
+        return Excel::download(new AbsensiSiswaExport($request), $filename);
     }
 } 

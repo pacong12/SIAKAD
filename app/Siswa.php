@@ -14,12 +14,14 @@ class Siswa extends Model
 
     public function mapel()
     {
-        return $this->belongsToMany(Mapel::class, 'nilai_siswa')->withPivot(['uts', 'uas', 'status']);
+        return $this->belongsToMany(Mapel::class, 'nilai_siswa')->withPivot(['uts', 'uas', 'status', 'thnakademik_id']);
     }
 
     public function thnakademik()
     {
-        return $this->belongsToMany(Thnakademik::class);
+        return $this->belongsToMany(Thnakademik::class, 'nilai_siswa', 'siswa_id', 'thnakademik_id')
+                    ->withPivot(['uts', 'uas', 'status'])
+                    ->withTimestamps();
     }
     
     public function kelas()
