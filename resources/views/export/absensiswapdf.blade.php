@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Laporan Absensi Siswa</title>
+  <title>Laporan presensi Siswa</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -113,7 +113,7 @@
   </div>
   
   <div class="report-title">
-    LAPORAN ABSENSI SISWA
+    LAPORAN PRESENSI SISWA
   </div>
   
   <div class="summary">
@@ -191,7 +191,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="7" class="text-center">Tidak ada data absensi</td>
+          <td colspan="7" class="text-center">Tidak ada data presensi</td>
         </tr>
       @endforelse
     </tbody>

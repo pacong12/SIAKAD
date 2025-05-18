@@ -13,7 +13,7 @@
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
           <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Laporan Absensi</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Filter Laporan Presensi</h6>
           </div>
           <div class="card-body">
             <form action="{{ route('absensiswa.cetaktgl', ['tglawal' => '_tglawal_', 'tglakhir' => '_tglakhir_']) }}" method="GET" target="_blank" id="formCetakAbsen">

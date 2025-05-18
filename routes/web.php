@@ -146,7 +146,7 @@ Route::prefix('/')
             Route::get('jadwal/exportpdf/{id}', 'JadwalmapelController@exportPdfGuru');
             Route::get('jadwal/exportexcel/{id}', 'JadwalmapelController@exportExcelGuru');
             
-            // Absensi routes
+            // Presensi routes
             Route::get('absensi', 'GuruAbsensiController@index')->name('guru.absensi.index');
             Route::get('absensi/proses/{id}', 'GuruAbsensiController@proses')->name('guru.absensi.proses');
             Route::post('absensi/store', 'GuruAbsensiController@store')->name('guru.absensi.store');

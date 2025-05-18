@@ -1,12 +1,12 @@
 @extends('layouts.admin.admin')
 
-@section('title', 'Input Absensi Siswa')
+@section('title', 'Input Presensi Siswa')
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Input Absensi Siswa</h1>
+        <h1 class="h3 mb-0 text-gray-800">Input Presensi Siswa</h1>
         <a href="{{ route('guru.absensi.index') }}" class="btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
         </a>
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <!-- Statistik Absensi -->
+    <!-- Statistik Presensi -->
     @if(count($siswa) > 0)
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
@@ -219,7 +219,7 @@
                             
                             <div class="text-right mt-3">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save fa-sm text-white-50"></i> Simpan Absensi
+                                    <i class="fas fa-save fa-sm text-white-50"></i> Simpan Presensi
                                 </button>
                             </div>
                         </form>

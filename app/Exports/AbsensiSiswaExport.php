@@ -108,7 +108,7 @@ class AbsensiSiswaExport implements FromCollection, WithHeadings, WithMapping, W
                 
                 // Tambahkan judul laporan di atas
                 $event->sheet->mergeCells('A1:F1');
-                $event->sheet->setCellValue('A1', 'LAPORAN ABSENSI SISWA');
+                $event->sheet->setCellValue('A1', 'LAPORAN PRESENSI SISWA');
                 $event->sheet->getDelegate()->getStyle('A1')->getFont()->setBold(true);
                 $event->sheet->getDelegate()->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 

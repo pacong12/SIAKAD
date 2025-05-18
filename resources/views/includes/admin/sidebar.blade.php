@@ -94,12 +94,12 @@
     <li class="nav-item {{ request()->is('admin/absensiswa*', 'admin/cetakAbsen*') ? 'active' : '' }}">
       <a class="nav-link {{ request()->is('admin/absensiswa*', 'admin/cetakAbsen*') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="{{ request()->is('admin/absensiswa*', 'admin/cetakAbsen*') ? 'true' : 'false' }}" aria-controls="collapseThree">
         <i class="fas fa-fw fa-calendar-check"></i>
-        <span>Absen</span>
+        <span>Presensi</span>
       </a>
       <div id="collapseThree" class="collapse {{ request()->is('admin/absensiswa*', 'admin/cetakAbsen*') ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-          <a class="collapse-item {{ request()->is('admin/absensiswa') ? 'active' : '' }}" href="{{route('absensiswa.index')}}">Absen Siswa</a>
-          <a class="collapse-item {{ request()->is('admin/cetakAbsenSiswa*') ? 'active' : '' }}" href="{{route('absensiswa.cetakAbsen')}}">Cetak Absen</a>
+          <a class="collapse-item {{ request()->is('admin/absensiswa') ? 'active' : '' }}" href="{{route('absensiswa.index')}}">Presensi Siswa</a>
+          <a class="collapse-item {{ request()->is('admin/cetakAbsenSiswa*') ? 'active' : '' }}" href="{{route('absensiswa.cetakAbsen')}}">Cetak Presensi</a>
         </div>
       </div>
     </li>

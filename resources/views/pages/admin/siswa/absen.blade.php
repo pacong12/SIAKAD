@@ -9,7 +9,7 @@
     <div class="container">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800 mt-4">Absensi Siswa {{auth()->user()->siswa->nama}}</h1>
+        <h1 class="h3 mb-4 text-gray-800 mt-4">Presensi Siswa {{auth()->user()->siswa->nama}}</h1>
 
         <!-- DataTales Example -->
         <div class="card shadow">
@@ -55,7 +55,7 @@
               <div class="row">
                 <div class="card col-lg-12 ml-auto mr-auto">
                     <div class="card-header">
-                      Riwayat Absensi
+                      Riwayat Presensi
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

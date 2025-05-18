@@ -1,16 +1,16 @@
 @extends('layouts.admin.admin')
 
-@section('title', 'Absensi Siswa')
+@section('title', 'Presensi Siswa')
 
 @section('content')
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>Absensi Siswa</h1>
+            <h1>Presensi Siswa</h1>
         </div>
 
         <div class="section-body">
-            <h2 class="section-title">Input Absensi Siswa</h2>
+            <h2 class="section-title">Input Presensi Siswa</h2>
             
             @if (session('status'))
                 <div class="alert alert-success">
@@ -24,7 +24,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
                 </div>
                 <div class="card-body">
-                    <p>Silahkan pilih kelas untuk melakukan input absensi siswa.</p>
+                    <p>Silahkan pilih kelas untuk melakukan input Presensi siswa.</p>
                 </div>
             </div>
             
@@ -49,7 +49,7 @@
                                             </small>
                                         </p>
                                         <a href="{{ route('guru.absensi.proses', $item->id) }}" class="btn btn-primary">
-                                            <i class="fas fa-user-check mr-1"></i> Input Absensi
+                                            <i class="fas fa-user-check mr-1"></i> Input Presensi
                                         </a>
                                     </div>
                                 </div>

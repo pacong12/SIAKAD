@@ -1,12 +1,12 @@
 @extends('layouts.admin.admin')
 
-@section('title', 'Laporan Absensi Siswa')
+@section('title', 'Laporan Presensi Siswa')
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Laporan Absensi Siswa</h1>
+        <h1 class="h3 mb-0 text-gray-800">Laporan Presensi Siswa</h1>
         <a href="{{ route('guru.absensi.index') }}" class="btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
         </a>
@@ -173,7 +173,7 @@
         <!-- Tabel Data -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-clipboard-list"></i> Data Absensi</h6>
+                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-clipboard-list"></i> Data Presensi</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -219,12 +219,12 @@
     @elseif(request()->has('kelas_id') || request()->has('siswa_id') || request()->has('tanggal_mulai'))
         <div class="alert alert-info shadow-sm">
             <h5><i class="fas fa-info-circle mr-1"></i> Informasi</h5>
-            <p class="mb-0">Tidak ada data absensi yang ditemukan untuk filter yang dipilih.</p>
+            <p class="mb-0">Tidak ada data Presensi yang ditemukan untuk filter yang dipilih.</p>
         </div>
     @else
         <div class="alert alert-light shadow-sm">
             <h5><i class="fas fa-arrow-up mr-1"></i> Silahkan Pilih Filter</h5>
-            <p class="mb-0">Gunakan filter di atas untuk menampilkan data absensi siswa.</p>
+            <p class="mb-0">Gunakan filter di atas untuk menampilkan data Presensi siswa.</p>
         </div>
     @endif
 </div>
